@@ -863,11 +863,11 @@ function Strategy({ bible, insights, videoLog, setErr }) {
                 </div>
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
-                <div style={{ background:navy, borderRadius:8, padding:10 }}>
+                <div style={{ background:panel2, borderRadius:8, padding:10 }}>
                   <div style={{ fontSize:10.5, color:gold, fontWeight:700, letterSpacing:1, marginBottom:5 }}>🪝 HOOK TYPE</div>
                   <div style={{ fontSize:13, color:cream }}>{d.hook}</div>
                 </div>
-                <div style={{ background:navy, borderRadius:8, padding:10 }}>
+                <div style={{ background:panel2, borderRadius:8, padding:10 }}>
                   <div style={{ fontSize:10.5, color:gold, fontWeight:700, letterSpacing:1, marginBottom:5 }}>📝 EXAMPLE</div>
                   <div style={{ fontSize:13, color:cream, fontStyle:"italic" }}>"{d.example}"</div>
                 </div>
@@ -2574,7 +2574,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
               <b style={{ color:gold }}>Step 4</b> — Click Deploy → New deployment → Web App → Anyone can access → Deploy<br/>
               <b style={{ color:gold }}>Step 5</b> — Copy the Web App URL and paste below
             </div>
-            <div style={{ background:navy, borderRadius:8, padding:10, marginBottom:10, fontSize:11.5, fontFamily:"monospace", color:"#84B8E6", lineHeight:1.6, overflowX:"auto" }}>
+            <div style={{ background:"#2D3748", borderRadius:8, padding:10, marginBottom:10, fontSize:11.5, fontFamily:"monospace", color:"#84B8E6", lineHeight:1.6, overflowX:"auto" }}>
               {`function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -2988,9 +2988,9 @@ function Step({ n, crew, label }) {
 }
 
 /* ---------- styles ---------- */
-const navy = "#F8F9FB", panel = "#FFFFFF", panel2 = "#F0F2F8", line = "#E2E5EF", gold = "#B8860B", goldLight = "#D4AF37", goldDeep = "#9A6F00", cream = "#1A1A2E", mute = "#6B7280";
+const navy = "#1A1A2E", panel = "#FFFFFF", panel2 = "#F0F2F8", line = "#E2E5EF", gold = "#B8860B", goldLight = "#D4AF37", goldDeep = "#9A6F00", cream = "#1A1A2E", mute = "#6B7280", appBg = "#F5F6FA";
 const S = {
-  app: { minHeight:"100vh", background:"#F5F6FA", color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
+  app: { minHeight:"100vh", background:appBg, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
   header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFFFFEE", backdropFilter:"blur(16px)", zIndex:10 },
   brandRow: { display:"flex", alignItems:"center", gap:14, marginBottom:12 },
   wordmark: { fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", fontSize:24, fontWeight:900, letterSpacing:2, lineHeight:1, display:"block" },
