@@ -2921,8 +2921,8 @@ function Style() {
     textarea,input,select,button{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
     button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #D4AF37;outline-offset:2px}
     ::-webkit-scrollbar{width:7px;height:7px}
-    ::-webkit-scrollbar-track{background:#F0F2F8}
-    ::-webkit-scrollbar-thumb{background:#C8C8D8;border-radius:8px}
+    ::-webkit-scrollbar-track{background:#0A0E1F}
+    ::-webkit-scrollbar-thumb{background:#2A335C;border-radius:8px}
     ::-webkit-scrollbar-thumb:hover{background:#B8860B88}
     .wave-container{position:fixed;bottom:0;left:0;width:100%;height:100px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.12}
     .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23D4AF37' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
@@ -2988,10 +2988,10 @@ function Step({ n, crew, label }) {
 }
 
 /* ---------- styles ---------- */
-const navy = "#1A1A2E", panel = "#FFFFFF", panel2 = "#F0F2F8", line = "#E2E5EF", gold = "#B8860B", goldLight = "#D4AF37", goldDeep = "#9A6F00", cream = "#1A1A2E", mute = "#6B7280", appBg = "#F5F6FA";
+const navy = "#0A0E1F", panel = "#111827", panel2 = "#1a2035", line = "#2A335C", gold = "#D4AF37", goldLight = "#E8C77E", goldDeep = "#C8922A", cream = "#F3EEE2", mute = "#7E8AAC", appBg = "#0A0E1F";
 const S = {
-  app: { minHeight:"100vh", background:appBg, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
-  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFFFFEE", backdropFilter:"blur(16px)", zIndex:10 },
+  app: { minHeight:"100vh", background:`radial-gradient(ellipse 120% 60% at 60% -10%,#1A2350 0%,#0A0E1F 60%),repeating-linear-gradient(45deg,#0D1228 0px,#0D1228 2px,transparent 2px,transparent 20px)`, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
+  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:`${navy}F0`, backdropFilter:"blur(16px)", zIndex:10 },
   brandRow: { display:"flex", alignItems:"center", gap:14, marginBottom:12 },
   wordmark: { fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", fontSize:24, fontWeight:900, letterSpacing:2, lineHeight:1, display:"block" },
   tagline: { fontSize:11, color:mute, marginTop:3, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
@@ -3011,7 +3011,7 @@ const S = {
   crewBlurb: { fontSize:13, color:mute, lineHeight:1.55, margin:"10px 0 0" },
   input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:9, color:cream, fontSize:13.5, outline:"none" },
   textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:10, color:cream, fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
-  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
+  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
   ghost: { background:"transparent", color:cream, border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
   linkBtn: { background:"none", border:"none", color:"#E05060", textDecoration:"underline", cursor:"pointer", fontSize:12 },
   chip: { background:"transparent", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
@@ -3022,7 +3022,7 @@ const S = {
   trendReason: { fontSize:12.5, color:mute, marginTop:3, lineHeight:1.5 },
   thread: { marginTop:12, paddingRight:4 },
   verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF8DC)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}22` },
-  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#5C4500" },
+  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:goldLight },
   directive: { fontSize:12.5, color:"#7A5C00CC", marginTop:9 },
   yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream, marginBottom:4 },
   subtle: { fontSize:12.5, color:mute, marginBottom:4 },
@@ -3036,7 +3036,7 @@ const S = {
   formGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:10, marginTop:12 },
   fieldLbl: { fontSize:11, color:mute, display:"block", marginBottom:4, letterSpacing:0.5 },
   scoreLbl: { fontSize:9.5, color:mute, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  briefBack: { background:panel2, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
+  briefBack: { background:navy, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
   shotBox: { background:panel2, border:`1px dashed ${gold}66`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
   weekRow: { display:"flex", gap:12, padding:"13px 0", borderTop:`1px solid ${line}` },
   weekNum: { width:34, height:34, borderRadius:9, background:`linear-gradient(135deg,${gold},${goldDeep})`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"#FFFFFF", fontSize:13, fontFamily:"'DM Sans',system-ui,sans-serif" },
