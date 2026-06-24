@@ -326,31 +326,39 @@ function getSizeKB(value) {
 }
 
 async function loadKey(key, fallback) {
-  // Try Supabase via server API first
+  // Always try Supabase first — it's the source of truth across devices
   try {
     const r = await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "db_get", dataKey: key })
     });
-    const d = await r.json();
-    if (d.value != null) return d.value;
+    if (r.ok) {
+      const d = await r.json();
+      if (d.value != null) {
+        // Also update localStorage as cache
+        try { localStorage.setItem(key, JSON.stringify(d.value)); } catch(e) {}
+        return d.value;
+      }
+    }
   } catch(e) {}
-  // Fall back to localStorage
+  // Fall back to localStorage if Supabase unreachable
   try { const v = localStorage.getItem(key); return v != null ? JSON.parse(v) : fallback; }
   catch(e) { return fallback; }
 }
 
 async function saveKey(key, value) {
   const trimmed = trimData(key, value);
-  // Save to localStorage immediately
+  // Save to localStorage immediately as backup
   try { localStorage.setItem(key, JSON.stringify(trimmed)); } catch(e) {}
-  // Sync to Supabase via server API
+  // Always await Supabase save — this is the permanent storage
   try {
-    fetch("/api/crew", {
+    await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "db_set", dataKey: key, value: trimmed })
     });
-  } catch(e) {}
+  } catch(e) {
+    console.warn("Supabase save failed for", key, "— data is in localStorage as backup");
+  }
 }
 
 /* ===================== APP ===================== */
@@ -377,15 +385,25 @@ export default function App() {
   const [studioPendingTopic, setStudioPendingTopic] = useState(null);
   const [err, setErr] = useState(null);
   const [hydrated, setHydrated] = useState(false);
+  const [syncStatus, setSyncStatus] = useState("connecting"); // "connected" | "offline" | "connecting"
 
   // Storage health — warn when approaching auto-trim limits
   const storageWarning = hydrated && (
     videoLog.length > 250 || finalScripts.length > 350 || insights.length > 80 || ideas.length > 170
   );
 
-  // Load saved data once on open (syncs across PC + phone on the same account)
+  // Load saved data once on open (syncs across PC + phone via Supabase)
   useEffect(() => {
     (async () => {
+      // Test Supabase connection first
+      try {
+        const test = await fetch("/api/crew", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "db_get", dataKey: "jg_ping" })
+        });
+        setSyncStatus(test.ok ? "connected" : "offline");
+      } catch(e) { setSyncStatus("offline"); }
+
       setBible(await loadKey("jg_bible", DEFAULT_BIBLE));
       setInsights(await loadKey("jg_insights", []));
       setVideoLog(await loadKey("jg_videoLog", []));
@@ -511,7 +529,16 @@ function Header({ tab, setTab }) {
         <JollyRoger size={44} />
         <div style={{ flex:1 }}>
           <div style={S.wordmark} className="gold-shimmer">JAYDEN GEM</div>
-          <div style={S.tagline}>⚓ Grand Line Marketing Crew · 5 Pirates on Deck</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:3 }}>
+            <div style={S.tagline}>⚓ AI Marketing Crew · 5 on Deck</div>
+            <div style={{ fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:10,
+              background: syncStatus==="connected" ? "#E8F5E9" : syncStatus==="offline" ? "#FFF3E0" : "#F5F5F5",
+              color: syncStatus==="connected" ? "#2E7D32" : syncStatus==="offline" ? "#E65100" : "#9E9E9E",
+              border: `1px solid ${syncStatus==="connected" ? "#A5D6A7" : syncStatus==="offline" ? "#FFCC80" : "#E0E0E0"}`
+            }}>
+              {syncStatus==="connected" ? "🟢 Synced" : syncStatus==="offline" ? "🟠 Offline" : "⏳ Connecting"}
+            </div>
+          </div>
         </div>
       </div>
       {/* Nav — wraps into multiple rows so all tabs visible at once */}
