@@ -279,7 +279,7 @@ function SpeedControl() {
   const [manual, setManual] = useState("");
   const update = (v) => { const n = Math.min(2.0, Math.max(0.5, v)); setSpeed(n); window._jaydenSpeed = n; };
   return (
-    <div style={{ background:"#1C2650", border:"1px solid #2A335C", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
+    <div style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
       <div style={{ fontSize:11, color:"#D4AF37", fontWeight:700, letterSpacing:1.5, marginBottom:8, textTransform:"uppercase" }}>🔊 Voice speed — {speed.toFixed(2)}x</div>
       <input type="range" min="0.5" max="2.0" step="0.05" value={speed}
         style={{ width:"100%", accentColor:"#D4AF37", marginBottom:8, display:"block" }}
@@ -297,7 +297,7 @@ function SpeedControl() {
           </button>
         ))}
         <div style={{ display:"flex", alignItems:"center", gap:5, marginLeft:"auto" }}>
-          <span style={{ fontSize:11, color:"#9298BC" }}>Custom:</span>
+          <span style={{ fontSize:11, color:"#6B7280" }}>Custom:</span>
           <input
             type="number" min="0.5" max="2.0" step="0.05"
             placeholder="1.3"
@@ -305,7 +305,7 @@ function SpeedControl() {
             onChange={e=>setManual(e.target.value)}
             onKeyDown={e=>{ if(e.key==="Enter"){ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}}
             onBlur={()=>{ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}
-            style={{ background:"#1C2650", border:"1px solid #2A335C", borderRadius:9, color:"#F3EEE2", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
+            style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:9, color:"#1A1A2E", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
           />
         </div>
       </div>
@@ -619,8 +619,8 @@ function CrewView() {
     <div>
       <div style={{ textAlign:"center", padding:"24px 0 20px" }}>
         <div style={{ fontSize:12, letterSpacing:3, textTransform:"uppercase", color:"#D4AF37", fontFamily:"'DM Sans',system-ui,sans-serif", marginBottom:8 }}>⚓ Grand Line Marketing Crew ⚓</div>
-        <h1 style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:26, fontWeight:900, color:"#F3EEE2", margin:"0 0 6px", lineHeight:1.1 }}>MUGIWARA<br/><span style={{ fontSize:18, color:"#D4AF37" }}>JEWELRY PIRATES</span></h1>
-        <p style={{ fontSize:13.5, color:"#9298BC", lineHeight:1.6, maxWidth:460, margin:"8px auto 0" }}>Five nakama. One mission: dominate the Myanmar jewelry FYP and make <b style={{ color:"#F3EEE2" }}>Jayden Gem</b> the most legendary piece on the Grand Line.</p>
+        <h1 style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:26, fontWeight:900, color:"#1A1A2E", margin:"0 0 6px", lineHeight:1.1 }}>MUGIWARA<br/><span style={{ fontSize:18, color:"#D4AF37" }}>JEWELRY PIRATES</span></h1>
+        <p style={{ fontSize:13.5, color:"#6B7280", lineHeight:1.6, maxWidth:460, margin:"8px auto 0" }}>Five nakama. One mission: dominate the Myanmar jewelry FYP and make <b style={{ color:"#1A1A2E" }}>Jayden Gem</b> the most legendary piece on the Grand Line.</p>
         <div style={{ display:"flex", alignItems:"center", gap:10, margin:"16px auto 0", maxWidth:400 }}>
           <div style={{ flex:1, height:1, background:"linear-gradient(90deg,transparent,#D4AF3766,transparent)" }}/>
           <span style={{ color:"#D4AF37", fontSize:18 }}>☠</span>
@@ -640,12 +640,12 @@ function CrewView() {
               <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:12 }}>
                 <Portrait size={54} />
                 <div>
-                  <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#F3EEE2", letterSpacing:0.3 }}>{m.name}</div>
+                  <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#1A1A2E", letterSpacing:0.3 }}>{m.name}</div>
                   <div style={{ fontSize:11, fontWeight:600, color:m.facet, marginTop:2, letterSpacing:0.5 }}>{m.role.toUpperCase()}</div>
                   <span style={{ display:"inline-block", marginTop:5, fontSize:10, background:bg, color:fg, border:`1px solid ${border}`, borderRadius:5, padding:"1px 6px", fontWeight:700 }}>{badges[k]}</span>
                 </div>
               </div>
-              <div style={{ fontSize:13, color:"#9298BC", lineHeight:1.55, borderTop:`1px solid ${m.gem}33`, paddingTop:10 }}>{m.blurb}</div>
+              <div style={{ fontSize:13, color:"#6B7280", lineHeight:1.55, borderTop:`1px solid ${m.gem}33`, paddingTop:10 }}>{m.blurb}</div>
               <div style={{ height:2, background:`linear-gradient(90deg,transparent,${m.gem},transparent)`, borderRadius:2, marginTop:12, opacity:0.5 }}/>
             </div>
           );
@@ -656,8 +656,8 @@ function CrewView() {
         <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:12, color:"#D4AF37", letterSpacing:2, marginBottom:12 }}>📋 SHIP'S LOG — HOW THE CREW OPERATES</div>
         {[["🔮 Robin scouts","Finds hot celebrity jewelry trends — global + Myanmar FYP"],["⚔️ Crew debates","5 rounds of Robin vs Nami vs Usopp — best angle wins"],["👑 Luffy decides","Captain breaks deadlocks and gives the final directive"],["✋ You approve","Boss has final say — approve or send back with notes"],["✍️ Usopp writes","Scripts, shoot guide, CapCut guide, caption — all 5 accounts"],["📊 Nami analyzes","Reads your video stats cold — teaches the crew what works"],["🔧 Franky logs","Exports everything to your master Excel twice a week"]].map(([step,desc])=>(
           <div key={step} style={{ display:"flex", gap:12, alignItems:"start", padding:"8px 0", borderTop:"1px solid #2A335C44" }}>
-            <div style={{ fontSize:13, fontWeight:700, color:"#F3EEE2", minWidth:130, flexShrink:0 }}>{step}</div>
-            <div style={{ fontSize:13, color:"#9298BC", lineHeight:1.5 }}>{desc}</div>
+            <div style={{ fontSize:13, fontWeight:700, color:"#1A1A2E", minWidth:130, flexShrink:0 }}>{step}</div>
+            <div style={{ fontSize:13, color:"#6B7280", lineHeight:1.5 }}>{desc}</div>
           </div>
         ))}
       </div>
@@ -1642,16 +1642,17 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
     if (!f.title || !f.views) return;
     setErr(null); setBusy(true);
     try {
-      const hist = videoLog.slice(0,5).map(v=>`${v.title}: ${v.views}v ${v.completion}% ${v.dms}DM female${v.female||"?"}% fyp${v.fyp||"?"}% age${v.daysOld||"?"}d`).join(" | ")||"none";
-      const scriptBlock = f.script?.trim() ? `\nSCRIPT/CONTENT:\n${f.script.slice(0,800)}` : "";
-      const commentBlock = f.commentPattern?.trim() ? `\nCOMMENT PATTERNS (boss's read of the comments, since API can't pull text): ${f.commentPattern}` : "";
-      const searchBlock = f.searchTerms?.trim() ? `\nSEARCH TERMS that led people to this video: ${f.searchTerms}` : "";
-      const sys = ctx(bible) + "\nYou are Nami, Analytics Analyst. Read this video against history. Cold and specific with numbers. Factor in how old the video is. If a script is provided, connect specific content decisions (hook, structure, topic, tone) to the performance numbers — what lines or moments likely drove saves/shares/drop-offs. If comment patterns or search terms are given, factor them into your audience read and next-topic suggestion.";
-      const usr = `New video (${f.daysOld||"?"} days since posted): ${JSON.stringify({...f, script:undefined, commentPattern:undefined, searchTerms:undefined, notes:undefined, noteImages:undefined})}${scriptBlock}${commentBlock}${searchBlock}\nLast 5: ${hist}\nReturn ONLY JSON: {"score":0-100,"viral":"Low|Medium|High|Explosive","dmConv":"x%","trend":"Improving|Declining|Stable","worked":["",""],"improve":["",""],"nextTopic":"","toRobin":"brief for researcher","toUsopp":"brief for writer — include specific script notes if script was provided","summary":"one-line pattern learned","audienceNote":"one insight from gender/age/location/FYP data","momentumNote":"is this video still growing peaked or slowing based on age vs views","scriptNote":"one specific insight connecting script content to a performance number — empty string if no script provided","commentInsight":"one insight from the comment patterns or search terms — empty string if none provided"}`;
-      const ai = await ask(sys, usr, true, 1200);
+      const hist = videoLog.slice(0,3).map(v=>`${v.title}: ${v.views}v ${v.completion}% female${v.female||"?"}% fyp${v.fyp||"?"}%`).join(" | ")||"none";
+      const scriptBlock = f.script?.trim() ? `\nScript: ${f.script.slice(0,400)}` : "";
+      const commentBlock = f.commentPattern?.trim() ? `\nComments: ${f.commentPattern.slice(0,200)}` : "";
+      const searchBlock = f.searchTerms?.trim() ? `\nSearch terms: ${f.searchTerms.slice(0,100)}` : "";
+      const sys = "You are Nami, Analytics Analyst for a Myanmar jewelry TikTok creator. Be cold, specific, and direct with numbers. Return ONLY valid JSON.";
+      const stats = { title:f.title, account:f.account, views:f.views, watch:f.watch, completion:f.completion, likes:f.likes, comments:f.comments, shares:f.shares, saves:f.saves, female:f.female, male:f.male, age1824:f.age1824, topCountry:f.topCountry, fyp:f.fyp, daysOld:f.daysOld };
+      const usr = `Video stats: ${JSON.stringify(stats)}${scriptBlock}${commentBlock}${searchBlock}\nLast 3 videos: ${hist}\nReturn ONLY JSON (no markdown): {"score":0,"viral":"Low|Medium|High|Explosive","trend":"Improving|Declining|Stable","worked":["",""],"improve":["",""],"nextTopic":"","toRobin":"","toUsopp":"","summary":"","audienceNote":"","momentumNote":"","scriptNote":"","commentInsight":""}`;
+      const ai = await ask(sys, usr, true, 1500);
       if (editId) {
         setVideoLog(videoLog.map(v => v.id===editId ? { ...f, ai, id:editId, updated:today } : v));
-        setInsights([ai, ...insights]); // learn from updated stats too
+        setInsights([ai, ...insights]);
         setEditId(null);
       } else {
         setVideoLog([{ ...f, ai, id:Date.now(), loggedAt:new Date().toISOString() }, ...videoLog]);
@@ -1827,7 +1828,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
         <Step crew="nami" label={editId ? "Update this video's stats" : "Log a video"} />
 
         <div style={S.shotBox}>
-          <div style={{ fontSize:13.5, fontWeight:600, color:"#F3EEE2", marginBottom:4 }}>
+          <div style={{ fontSize:13.5, fontWeight:600, color:"#1A1A2E", marginBottom:4 }}>
             📸 Upload screenshots — Nami reads them for you
           </div>
           <div style={{ fontSize:12.5, color:mute, marginBottom:10, lineHeight:1.6 }}>
@@ -2761,7 +2762,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
       </div>
 
       {/* Chat thread */}
-      <div style={{ background:navy, borderRadius:16, border:`1px solid ${line}`, overflow:"hidden", marginBottom:12 }}>
+      <div style={{ background:"#FFFFFF", borderRadius:16, border:`1px solid ${line}`, overflow:"hidden", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ maxHeight:480, overflowY:"auto", padding:"16px 14px" }}>
           {messages.map(msg => {
             const isYou = msg.from === "you";
@@ -2780,7 +2781,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
                       <SpeakBtn text={msg.text} crewKey={msg.from} small />
                     </div>
                   )}
-                  <div style={{ fontSize:13.5, color: isYou?navy:cream, lineHeight:1.55 }}>{msg.text}</div>
+                  <div style={{ fontSize:13.5, color: isYou?"#FFFFFF":cream, lineHeight:1.55 }}>{msg.text}</div>
                   <div style={{ fontSize:10.5, color: isYou?"#8B6914":mute, marginTop:4, textAlign:"right" }}>{msg.ts}</div>
                   {!isYou && (
                     <div style={{ marginTop:6, textAlign:"right" }}>
@@ -2807,7 +2808,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
           })}
           {busy && (
             <div style={{ display:"flex", gap:10, alignItems:"flex-end", marginBottom:14 }}>
-              <div style={{ width:32, height:32, borderRadius:"50%", background:"#2A335C", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💭</div>
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"#E2E5EF", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💭</div>
               <div style={{ background:panel2, borderRadius:"16px 16px 16px 4px", padding:"12px 16px", border:`1px solid ${line}` }}>
                 <Typing />
               </div>
@@ -2817,7 +2818,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
         </div>
 
         {/* Input bar */}
-        <div style={{ borderTop:`1px solid ${line}`, padding:"10px 12px", display:"flex", gap:8, background:panel }}>
+        <div style={{ borderTop:`1px solid ${line}`, padding:"10px 12px", display:"flex", gap:8, background:"#F8F9FB" }}>
           <input
             style={{ ...S.input, flex:1, borderRadius:20, padding:"9px 16px" }}
             placeholder={activeCrew==="all" ? "Ask the whole crew…" : `Talk to ${CREW[activeCrew]?.name}…`}
@@ -2893,9 +2894,9 @@ function Style() {
     textarea,input,select,button{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
     button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #D4AF37;outline-offset:2px}
     ::-webkit-scrollbar{width:7px;height:7px}
-    ::-webkit-scrollbar-track{background:#0A0E1F}
-    ::-webkit-scrollbar-thumb{background:#2A335C;border-radius:8px}
-    ::-webkit-scrollbar-thumb:hover{background:#D4AF3766}
+    ::-webkit-scrollbar-track{background:#F0F2F8}
+    ::-webkit-scrollbar-thumb{background:#C8C8D8;border-radius:8px}
+    ::-webkit-scrollbar-thumb:hover{background:#B8860B88}
     .wave-container{position:fixed;bottom:0;left:0;width:100%;height:100px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.12}
     .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23D4AF37' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
     .wave2{animation-delay:-4s;opacity:0.5}
@@ -2926,7 +2927,7 @@ function Bubble({ d, bossEntry }) {
           <span style={{ fontWeight:700, fontSize:12.5, color:"#F0D27A" }}>You (Boss)</span>
           <span style={{ color:"#5A6080", fontSize:11 }}>jumped in</span>
         </div>
-        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#F3EEE2", paddingLeft:26, borderLeft:"2px solid #D4AF37", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
+        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #D4AF37", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
       </div>
     );
   }
@@ -2960,68 +2961,68 @@ function Step({ n, crew, label }) {
 }
 
 /* ---------- styles ---------- */
-const navy = "#0A0E1F", panel = "#111827", panel2 = "#1a2035", line = "#2A335C", gold = "#D4AF37", goldLight = "#E8C77E", goldDeep = "#C8922A", cream = "#F3EEE2", mute = "#7E8AAC";
+const navy = "#F8F9FB", panel = "#FFFFFF", panel2 = "#F0F2F8", line = "#E2E5EF", gold = "#B8860B", goldLight = "#D4AF37", goldDeep = "#9A6F00", cream = "#1A1A2E", mute = "#6B7280";
 const S = {
-  app: { minHeight:"100vh", background:`radial-gradient(ellipse 120% 60% at 60% -10%,#1A2350 0%,#0A0E1F 60%),repeating-linear-gradient(45deg,#0D1228 0px,#0D1228 2px,transparent 2px,transparent 20px)`, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60, position:"relative" },
-  header: { padding:"16px 18px 10px", borderBottom:`1px solid #D4AF3733`, position:"sticky", top:0, background:`${navy}F0`, backdropFilter:"blur(16px)", zIndex:10 },
+  app: { minHeight:"100vh", background:"#F5F6FA", color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
+  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFFFFEE", backdropFilter:"blur(16px)", zIndex:10 },
   brandRow: { display:"flex", alignItems:"center", gap:14, marginBottom:12 },
   wordmark: { fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", fontSize:24, fontWeight:900, letterSpacing:2, lineHeight:1, display:"block" },
-  tagline: { fontSize:11, color:"#D4AF3788", marginTop:3, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  tagline: { fontSize:11, color:mute, marginTop:3, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
   nav: { display:"flex", gap:4, flexWrap:"wrap" },
   navBtn: { background:"none", border:"1px solid transparent", color:mute, fontSize:12, padding:"5px 9px", borderRadius:7, cursor:"pointer", fontWeight:500, whiteSpace:"nowrap", transition:"all 0.15s" },
-  navOn: { color:navy, background:`linear-gradient(135deg,${gold},${goldDeep})`, border:"1px solid #C8922A", fontWeight:700 },
-  main: { maxWidth:800, margin:"0 auto", padding:"22px 16px", position:"relative", zIndex:1 },
+  navOn: { color:"#FFFFFF", background:`linear-gradient(135deg,${gold},${goldDeep})`, border:`1px solid ${goldDeep}`, fontWeight:700 },
+  main: { maxWidth:800, margin:"0 auto", padding:"22px 16px" },
   eyebrow: { fontSize:10.5, letterSpacing:2.5, textTransform:"uppercase", color:gold, fontWeight:700, marginBottom:6, fontFamily:"'DM Sans',system-ui,sans-serif" },
   h2: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:24, fontWeight:700, margin:"0 0 8px", color:cream, lineHeight:1.2 },
   lede: { fontSize:13.5, color:mute, lineHeight:1.65, margin:"0 0 18px", maxWidth:560 },
-  card: { background:`linear-gradient(145deg,${panel},${navy})`, border:`1px solid #2A335C`, borderRadius:16, padding:"18px 18px", marginBottom:14, position:"relative", overflow:"hidden" },
+  card: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:"18px 18px", marginBottom:14, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
   cardTitle: { fontWeight:700, fontSize:15, marginBottom:8, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
   crewGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:12 },
-  crewCard: { background:`linear-gradient(145deg,${panel},${navy})`, border:`1px solid ${line}`, borderRadius:16, padding:16 },
+  crewCard: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:16, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
   crewName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:15, color:cream },
   crewRole: { fontSize:12, fontWeight:600, marginTop:2, letterSpacing:0.5 },
   crewBlurb: { fontSize:13, color:mute, lineHeight:1.55, margin:"10px 0 0" },
-  input: { flex:1, minWidth:120, padding:"10px 13px", background:panel2, border:`1px solid ${line}`, borderRadius:9, color:cream, fontSize:13.5, outline:"none" },
-  textarea: { width:"100%", padding:"12px 14px", background:panel2, border:`1px solid ${line}`, borderRadius:10, color:cream, fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
-  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:"0 2px 12px #D4AF3733" },
+  input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:9, color:cream, fontSize:13.5, outline:"none" },
+  textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:10, color:cream, fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
+  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
   ghost: { background:"transparent", color:cream, border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
-  linkBtn: { background:"none", border:"none", color:"#F2929F", textDecoration:"underline", cursor:"pointer", fontSize:12 },
+  linkBtn: { background:"none", border:"none", color:"#E05060", textDecoration:"underline", cursor:"pointer", fontSize:12 },
   chip: { background:"transparent", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
-  seg: { background:panel, border:`1px solid ${line}`, color:mute, padding:"9px 16px", borderRadius:10, fontSize:13.5, fontWeight:600, cursor:"pointer" },
-  segOn: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, borderColor:gold },
+  seg: { background:"#FFFFFF", border:`1px solid ${line}`, color:mute, padding:"9px 16px", borderRadius:10, fontSize:13.5, fontWeight:600, cursor:"pointer" },
+  segOn: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", borderColor:gold },
   trendRow: { display:"flex", gap:12, alignItems:"center", padding:"13px 0", borderTop:`1px solid ${line}` },
   trendName: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
   trendReason: { fontSize:12.5, color:mute, marginTop:3, lineHeight:1.5 },
   thread: { marginTop:12, paddingRight:4 },
-  verdictBox: { background:`linear-gradient(180deg,#1A1400,#120E00)`, border:`1px solid ${gold}55`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 0 20px ${gold}22` },
-  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:goldLight },
-  directive: { fontSize:12.5, color:"#E8C77ECC", marginTop:9 },
+  verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF8DC)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}22` },
+  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#5C4500" },
+  directive: { fontSize:12.5, color:"#7A5C00CC", marginTop:9 },
   yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream, marginBottom:4 },
   subtle: { fontSize:12.5, color:mute, marginBottom:4 },
-  stepNum: { width:26, height:26, borderRadius:"50%", background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" },
+  stepNum: { width:26, height:26, borderRadius:"50%", background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" },
   stepLabel: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
   briefBox: { background:panel2, border:`1px solid ${line}`, borderRadius:12, padding:14, marginTop:12 },
   miniLabel: { fontSize:10.5, letterSpacing:1.5, textTransform:"uppercase", color:gold, fontWeight:700, margin:"12px 0 5px", fontFamily:"'DM Sans',system-ui,sans-serif" },
-  ul: { margin:"0", paddingLeft:18, fontSize:13, color:"#D5D3E0", lineHeight:1.7 },
-  caption: { fontSize:13, color:"#D5D3E0", lineHeight:1.6, background:navy, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
-  logged: { fontSize:12.5, color:"#7FD3AE", marginTop:12 },
+  ul: { margin:"0", paddingLeft:18, fontSize:13, color:mute, lineHeight:1.7 },
+  caption: { fontSize:13, color:cream, lineHeight:1.6, background:panel2, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
+  logged: { fontSize:12.5, color:"#2D8A5E", marginTop:12 },
   formGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:10, marginTop:12 },
   fieldLbl: { fontSize:11, color:mute, display:"block", marginBottom:4, letterSpacing:0.5 },
   scoreLbl: { fontSize:9.5, color:mute, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  briefBack: { background:navy, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
-  shotBox: { background:navy, border:`1px dashed ${gold}55`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
+  briefBack: { background:panel2, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
+  shotBox: { background:panel2, border:`1px dashed ${gold}66`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
   weekRow: { display:"flex", gap:12, padding:"13px 0", borderTop:`1px solid ${line}` },
-  weekNum: { width:34, height:34, borderRadius:9, background:`linear-gradient(135deg,${gold},${goldDeep})`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:navy, fontSize:13, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  weekNum: { width:34, height:34, borderRadius:9, background:`linear-gradient(135deg,${gold},${goldDeep})`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"#FFFFFF", fontSize:13, fontFamily:"'DM Sans',system-ui,sans-serif" },
   weekFocus: { fontWeight:700, fontSize:14, color:cream, marginBottom:5, fontFamily:"'DM Sans',system-ui,sans-serif" },
   dayBlock: { padding:"12px 0", borderTop:`1px solid ${line}` },
   dayName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:16, color:gold, marginBottom:8, fontWeight:700 },
   postRow: { background:panel2, border:`1px solid ${line}`, borderRadius:10, padding:11, marginBottom:8 },
   postIdea: { fontSize:13.5, color:cream, fontWeight:600, lineHeight:1.5 },
   postFilm: { fontSize:12.5, color:mute, marginTop:5 },
-  postCap: { fontSize:12.5, color:"#9DBCE0", marginTop:4 },
+  postCap: { fontSize:12.5, color:"#4A6FA5", marginTop:4 },
   ideaText: { fontSize:14.5, color:cream, lineHeight:1.5, flex:1 },
-  ideaReact: { fontSize:13, color:"#D5D3E0", lineHeight:1.55, paddingLeft:22 },
+  ideaReact: { fontSize:13, color:mute, lineHeight:1.55, paddingLeft:22 },
   tag: { fontSize:11, padding:"3px 9px", borderRadius:7, background:panel2, color:mute, border:`1px solid ${line}`, fontWeight:600 },
   empty: { textAlign:"center", color:mute, fontSize:13.5, padding:"32px 10px", fontFamily:"'DM Sans',system-ui,sans-serif" },
-  err: { maxWidth:800, margin:"14px auto 0", background:"#3A1620", color:"#F2929F", padding:"11px 15px", borderRadius:10, fontSize:13, border:"1px solid #882040" },
+  err: { maxWidth:800, margin:"14px auto 0", background:"#FFF0F0", color:"#C0392B", padding:"11px 15px", borderRadius:10, fontSize:13, border:"1px solid #F5C6CB" },
 };
