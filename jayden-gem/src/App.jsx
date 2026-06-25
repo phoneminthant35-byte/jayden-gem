@@ -436,7 +436,7 @@ export default function App() {
         <div className="wave"/>
         <div className="wave wave2"/>
       </div>
-      <Header tab={tab} setTab={setTab} />
+      <Header tab={tab} setTab={setTab} syncStatus={syncStatus} />
       {err && <div style={S.err}>⚠️ <b>Something went wrong:</b> {err} <button style={S.linkBtn} onClick={() => setErr(null)}>dismiss</button></div>}
       {storageWarning && (
         <div style={{ maxWidth:800, margin:"10px auto 0", background:"#1A1400", color:"#F0D27A", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #6B541888", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -508,7 +508,7 @@ function JollyRoger({ size = 38 }) {
 }
 
 // ---------- Header / Nav ----------
-function Header({ tab, setTab }) {
+function Header({ tab, setTab, syncStatus }) {
   const tabs = [
     ["crew","⚓ Crew"],
     ["strategy","🗺️ Strategy"],
