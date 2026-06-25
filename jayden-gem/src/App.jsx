@@ -428,6 +428,23 @@ export default function App() {
   useEffect(() => { if (hydrated && calWeek) saveKey("jg_calWeek", calWeek); }, [calWeek, hydrated]);
   useEffect(() => { if (hydrated) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
 
+  // Auto-push to Google Sheets whenever key data changes (debounced 3s so it doesn't fire on every keystroke)
+  const sheetsTimerRef = useRef(null);
+  useEffect(() => {
+    if (!hydrated) return;
+    const webhookUrl = (() => { try { return localStorage.getItem("jg_sheets_webhook") || ""; } catch(e) { return ""; } })();
+    if (!webhookUrl) return;
+    clearTimeout(sheetsTimerRef.current);
+    sheetsTimerRef.current = setTimeout(() => {
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoLog, pageInsights, finalScripts, ideas, exportedAt: new Date().toISOString() })
+      }).catch(() => {}); // silent fail — don't bother the user
+    }, 3000);
+    return () => clearTimeout(sheetsTimerRef.current);
+  }, [videoLog, ideas, finalScripts, pageInsights, hydrated]);
+
   // Auto-backup: every time app loads with real data, silently snapshot to localStorage
   // This survives app updates — always a local copy even if Supabase fails
   useEffect(() => {
@@ -2725,7 +2742,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [],
           </div>
         ) : (
           <div>
-            <div style={{ fontSize:13, color:"#7FD3AE", marginBottom:8 }}>✓ Every time Franky exports, your Google Sheet updates automatically.</div>
+            <div style={{ fontSize:13, color:"#2D8A5E", marginBottom:8 }}>✓ Auto-push active — every time you log a video, save an idea, or add a script, Franky pushes to Google Sheets automatically (within 3 seconds).</div>
             <button style={{ ...S.ghost, fontSize:12 }} onClick={()=>{ 
               try { localStorage.removeItem("jg_sheets_webhook"); } catch(e) {}
               setWebhookUrl(""); 
