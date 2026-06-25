@@ -279,25 +279,25 @@ function SpeedControl() {
   const [manual, setManual] = useState("");
   const update = (v) => { const n = Math.min(2.0, Math.max(0.5, v)); setSpeed(n); window._jaydenSpeed = n; };
   return (
-    <div style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
-      <div style={{ fontSize:11, color:"#D4AF37", fontWeight:700, letterSpacing:1.5, marginBottom:8, textTransform:"uppercase" }}>🔊 Voice speed — {speed.toFixed(2)}x</div>
+    <div style={{ background:"#FFF9F0", border:"1px solid #E8DDD0", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
+      <div style={{ fontSize:11, color:"#C8922A", fontWeight:700, letterSpacing:1.5, marginBottom:8, textTransform:"uppercase" }}>🔊 Voice speed — {speed.toFixed(2)}x</div>
       <input type="range" min="0.5" max="2.0" step="0.05" value={speed}
-        style={{ width:"100%", accentColor:"#D4AF37", marginBottom:8, display:"block" }}
+        style={{ width:"100%", accentColor:"#C8922A", marginBottom:8, display:"block" }}
         onChange={e=>update(parseFloat(e.target.value))}
       />
       <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
         {[0.75, 1.0, 1.25, 1.5, 2.0].map(s=>(
           <button key={s} onClick={()=>update(s)}
             style={{ fontSize:11, padding:"5px 8px", borderRadius:6, cursor:"pointer",
-              background: Math.abs(speed-s)<0.03 ? "linear-gradient(135deg,#D4AF37,#C8922A)" : "transparent",
-              color: Math.abs(speed-s)<0.03 ? "#0A0E1F" : "#9298BC",
-              border:`1px solid ${Math.abs(speed-s)<0.03 ? "#C8922A" : "#2A335C"}`,
+              background: Math.abs(speed-s)<0.03 ? "linear-gradient(135deg,#C8922A,#8B5E0A)" : "transparent",
+              color: Math.abs(speed-s)<0.03 ? "#FFFFFF" : "#6B6560",
+              border:`1px solid ${Math.abs(speed-s)<0.03 ? "#8B5E0A" : "#D0CBC4"}`,
               fontWeight: Math.abs(speed-s)<0.03 ? 700 : 400 }}>
             {s}x
           </button>
         ))}
         <div style={{ display:"flex", alignItems:"center", gap:5, marginLeft:"auto" }}>
-          <span style={{ fontSize:11, color:"#6B7280" }}>Custom:</span>
+          <span style={{ fontSize:11, color:"#6B6560" }}>Custom:</span>
           <input
             type="number" min="0.5" max="2.0" step="0.05"
             placeholder="1.3"
@@ -305,7 +305,7 @@ function SpeedControl() {
             onChange={e=>setManual(e.target.value)}
             onKeyDown={e=>{ if(e.key==="Enter"){ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}}
             onBlur={()=>{ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}
-            style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:9, color:"#1A1A2E", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
+            style={{ background:"#FFFFFF", border:"1px solid #D0CBC4", borderRadius:9, color:"#1A1A2E", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
           />
         </div>
       </div>
@@ -891,12 +891,12 @@ function Strategy({ bible, insights, videoLog, setErr }) {
               <div style={{ flex:1 }}>
                 <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap", marginBottom:4 }}>
                   <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream }}>{st.type}</div>
-                  <span style={{ fontSize:10.5, background:"#1A2035", color:gold, border:"1px solid #D4AF3744", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>{st.trigger}</span>
+                  <span style={{ fontSize:10.5, background:"#FFF3E0", color:gold, border:"1px solid #C8922A44", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>{st.trigger}</span>
                 </div>
                 <div style={{ fontSize:13.5, color:"#C9D2F0", lineHeight:1.6, marginBottom:8 }}>{st.desc}</div>
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                   {st.examples.map(e => (
-                    <span key={e} style={{ fontSize:12, background:panel2, color:"#9DBCE0", border:`1px solid ${line}`, borderRadius:8, padding:"4px 10px", fontStyle:"italic" }}>"{e}"</span>
+                    <span key={e} style={{ fontSize:12, background:panel2, color:"#4A6FA5", border:`1px solid ${line}`, borderRadius:8, padding:"4px 10px", fontStyle:"italic" }}>"{e}"</span>
                   ))}
                 </div>
               </div>
@@ -2803,7 +2803,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
       </div>
 
       {/* Chat thread */}
-      <div style={{ background:"#FFFFFF", borderRadius:16, border:`1px solid ${line}`, overflow:"hidden", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ background:"#FFFFFF", borderRadius:16, border:`1px solid #E2DDD6`, overflow:"hidden", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ maxHeight:480, overflowY:"auto", padding:"16px 14px" }}>
           {messages.map(msg => {
             const isYou = msg.from === "you";
@@ -2815,7 +2815,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
                     {m?.icon}
                   </div>
                 )}
-                <div style={{ maxWidth:"72%", background: isYou ? `linear-gradient(135deg,#D4AF37,#C8922A)` : panel2, borderRadius: isYou?"16px 16px 4px 16px":"16px 16px 16px 4px", padding:"10px 13px", border: isYou?"none":`1px solid ${line}` }}>
+                <div style={{ maxWidth:"72%", background: isYou ? `linear-gradient(135deg,#C8922A,#8B5E0A)` : panel2, borderRadius: isYou?"16px 16px 4px 16px":"16px 16px 16px 4px", padding:"10px 13px", border: isYou?"none":`1px solid ${line}` }}>
                   {!isYou && (
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4 }}>
                       <div style={{ fontSize:11, fontWeight:700, color:m?.facet, letterSpacing:0.3 }}>{m?.name}</div>
@@ -2859,7 +2859,7 @@ If you have nothing to add to this specific question, stay quiet (return empty s
         </div>
 
         {/* Input bar */}
-        <div style={{ borderTop:`1px solid ${line}`, padding:"10px 12px", display:"flex", gap:8, background:"#F8F9FB" }}>
+        <div style={{ borderTop:`1px solid #E2DDD6`, padding:"10px 12px", display:"flex", gap:8, background:"#FAF9F7" }}>
           <input
             style={{ ...S.input, flex:1, borderRadius:20, padding:"9px 16px" }}
             placeholder={activeCrew==="all" ? "Ask the whole crew…" : `Talk to ${CREW[activeCrew]?.name}…`}
@@ -2933,17 +2933,17 @@ function Style() {
     @keyframes wave{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
     *{box-sizing:border-box}
     textarea,input,select,button{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
-    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #D4AF37;outline-offset:2px}
+    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #C8922A;outline-offset:2px}
     ::-webkit-scrollbar{width:7px;height:7px}
-    ::-webkit-scrollbar-track{background:#0A0E1F}
-    ::-webkit-scrollbar-thumb{background:#2A335C;border-radius:8px}
-    ::-webkit-scrollbar-thumb:hover{background:#B8860B88}
-    .wave-container{position:fixed;bottom:0;left:0;width:100%;height:100px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.12}
-    .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23D4AF37' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
+    ::-webkit-scrollbar-track{background:#F5F2EE}
+    ::-webkit-scrollbar-thumb{background:#D0CBC4;border-radius:8px}
+    ::-webkit-scrollbar-thumb:hover{background:#C8922A88}
+    .wave-container{position:fixed;bottom:0;left:0;width:100%;height:80px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.08}
+    .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23C8922A' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
     .wave2{animation-delay:-4s;opacity:0.5}
     .jolly-roger{animation:float 4s ease-in-out infinite}
     .crew-card-inner:hover{transform:translateY(-3px)}
-    .gold-shimmer{background:linear-gradient(90deg,#D4AF37,#F5E17A,#D4AF37,#A07C20,#D4AF37);background-size:200% auto;animation:shimmer 3s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .gold-shimmer{background:linear-gradient(90deg,#C8922A,#E8B84B,#C8922A,#8B5E0A,#C8922A);background-size:200% auto;animation:shimmer 3s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .nav-scroll{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .nav-scroll::-webkit-scrollbar{display:none}
   `}</style>;
@@ -2966,9 +2966,9 @@ function Bubble({ d, bossEntry }) {
         <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:4 }}>
           <span style={{ fontSize:15 }}>👑</span>
           <span style={{ fontWeight:700, fontSize:12.5, color:"#F0D27A" }}>You (Boss)</span>
-          <span style={{ color:"#5A6080", fontSize:11 }}>jumped in</span>
+          <span style={{ color:"#9B9490", fontSize:11 }}>jumped in</span>
         </div>
-        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #D4AF37", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
+        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #C8922A", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
       </div>
     );
   }
@@ -2977,11 +2977,11 @@ function Bubble({ d, bossEntry }) {
     <div style={{ marginBottom:14 }}>
       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3 }}>
         <span>{m.icon}</span>
-        <span style={{ fontWeight:600, fontSize:13, color:m.facet }}>{m.name} <span style={{ color:"#7E84A3", fontWeight:400 }}>({m.role})</span></span>
-        {d.round>0 && <span style={{ fontSize:11, color:"#5A6080" }}>· R{d.round}</span>}
+        <span style={{ fontWeight:600, fontSize:13, color:m.gem }}>{m.name} <span style={{ color:"#9B9490", fontWeight:400 }}>({m.role})</span></span>
+        {d.round>0 && <span style={{ fontSize:11, color:"#B0AAA5" }}>· R{d.round}</span>}
         <SpeakBtn text={`${m.name} says: ${d.text}`} crewKey={d.k} small />
       </div>
-      <div style={{ fontSize:13.5, lineHeight:1.55, color:"#E8E6F0", paddingLeft:24, borderLeft:`2px solid ${m.gem}55`, marginLeft:7 }}>{d.text}</div>
+      <div style={{ fontSize:13.5, lineHeight:1.55, color:"#1A1A2E", paddingLeft:24, borderLeft:`2px solid ${m.gem}88`, marginLeft:7 }}>{d.text}</div>
     </div>
   );
 }
@@ -3001,11 +3001,11 @@ function Step({ n, crew, label }) {
   </div>;
 }
 
-/* ---------- styles ---------- */
-const navy = "#0A0E1F", panel = "#111827", panel2 = "#1a2035", line = "#2A335C", gold = "#D4AF37", goldLight = "#E8C77E", goldDeep = "#C8922A", cream = "#F3EEE2", mute = "#7E8AAC", appBg = "#0A0E1F";
+/* ---------- styles — WHITE THEME ---------- */
+const navy = "#1A1A2E", panel = "#F8F7F4", panel2 = "#F0EDE8", line = "#E2DDD6", gold = "#C8922A", goldLight = "#A0710E", goldDeep = "#8B5E0A", cream = "#1A1A2E", mute = "#6B6560", appBg = "#FAF9F7";
 const S = {
-  app: { minHeight:"100vh", background:`radial-gradient(ellipse 120% 60% at 60% -10%,#1A2350 0%,#0A0E1F 60%),repeating-linear-gradient(45deg,#0D1228 0px,#0D1228 2px,transparent 2px,transparent 20px)`, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
-  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:`${navy}F0`, backdropFilter:"blur(16px)", zIndex:10 },
+  app: { minHeight:"100vh", background:"#FAF9F7", color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
+  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFEFCF5", backdropFilter:"blur(16px)", zIndex:10 },
   brandRow: { display:"flex", alignItems:"center", gap:14, marginBottom:12 },
   wordmark: { fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", fontSize:24, fontWeight:900, letterSpacing:2, lineHeight:1, display:"block" },
   tagline: { fontSize:11, color:mute, marginTop:3, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
@@ -3014,54 +3014,54 @@ const S = {
   navOn: { color:"#FFFFFF", background:`linear-gradient(135deg,${gold},${goldDeep})`, border:`1px solid ${goldDeep}`, fontWeight:700 },
   main: { maxWidth:800, margin:"0 auto", padding:"22px 16px" },
   eyebrow: { fontSize:10.5, letterSpacing:2.5, textTransform:"uppercase", color:gold, fontWeight:700, marginBottom:6, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  h2: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:24, fontWeight:700, margin:"0 0 8px", color:cream, lineHeight:1.2 },
+  h2: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:24, fontWeight:700, margin:"0 0 8px", color:"#1A1A2E", lineHeight:1.2 },
   lede: { fontSize:13.5, color:mute, lineHeight:1.65, margin:"0 0 18px", maxWidth:560 },
   card: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:"18px 18px", marginBottom:14, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
-  cardTitle: { fontWeight:700, fontSize:15, marginBottom:8, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  cardTitle: { fontWeight:700, fontSize:15, marginBottom:8, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   crewGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:12 },
   crewCard: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:16, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
-  crewName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:15, color:cream },
+  crewName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:15, color:"#1A1A2E" },
   crewRole: { fontSize:12, fontWeight:600, marginTop:2, letterSpacing:0.5 },
   crewBlurb: { fontSize:13, color:mute, lineHeight:1.55, margin:"10px 0 0" },
-  input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:9, color:cream, fontSize:13.5, outline:"none" },
-  textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:10, color:cream, fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
-  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
-  ghost: { background:"transparent", color:cream, border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
-  linkBtn: { background:"none", border:"none", color:"#E05060", textDecoration:"underline", cursor:"pointer", fontSize:12 },
-  chip: { background:"transparent", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
+  input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid #D0CBC4`, borderRadius:9, color:"#1A1A2E", fontSize:13.5, outline:"none" },
+  textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid #D0CBC4`, borderRadius:10, color:"#1A1A2E", fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
+  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
+  ghost: { background:"transparent", color:"#1A1A2E", border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
+  linkBtn: { background:"none", border:"none", color:"#C0392B", textDecoration:"underline", cursor:"pointer", fontSize:12 },
+  chip: { background:"#FFFFFF", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
   seg: { background:"#FFFFFF", border:`1px solid ${line}`, color:mute, padding:"9px 16px", borderRadius:10, fontSize:13.5, fontWeight:600, cursor:"pointer" },
   segOn: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", borderColor:gold },
   trendRow: { display:"flex", gap:12, alignItems:"center", padding:"13px 0", borderTop:`1px solid ${line}` },
-  trendName: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  trendName: { fontWeight:700, fontSize:14.5, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   trendReason: { fontSize:12.5, color:mute, marginTop:3, lineHeight:1.5 },
   thread: { marginTop:12, paddingRight:4 },
-  verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF8DC)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}22` },
-  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:goldLight },
+  verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF5D6)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}18` },
+  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#5C3D00" },
   directive: { fontSize:12.5, color:"#7A5C00CC", marginTop:9 },
-  yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream, marginBottom:4 },
+  yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#1A1A2E", marginBottom:4 },
   subtle: { fontSize:12.5, color:mute, marginBottom:4 },
   stepNum: { width:26, height:26, borderRadius:"50%", background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" },
-  stepLabel: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  stepLabel: { fontWeight:700, fontSize:14.5, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   briefBox: { background:panel2, border:`1px solid ${line}`, borderRadius:12, padding:14, marginTop:12 },
   miniLabel: { fontSize:10.5, letterSpacing:1.5, textTransform:"uppercase", color:gold, fontWeight:700, margin:"12px 0 5px", fontFamily:"'DM Sans',system-ui,sans-serif" },
   ul: { margin:"0", paddingLeft:18, fontSize:13, color:mute, lineHeight:1.7 },
-  caption: { fontSize:13, color:cream, lineHeight:1.6, background:panel2, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
+  caption: { fontSize:13, color:"#1A1A2E", lineHeight:1.6, background:panel2, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
   logged: { fontSize:12.5, color:"#2D8A5E", marginTop:12 },
   formGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:10, marginTop:12 },
   fieldLbl: { fontSize:11, color:mute, display:"block", marginBottom:4, letterSpacing:0.5 },
   scoreLbl: { fontSize:9.5, color:mute, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  briefBack: { background:navy, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
-  shotBox: { background:panel2, border:`1px dashed ${gold}66`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
+  briefBack: { background:"#F5F2EE", borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}`, color:"#1A1A2E" },
+  shotBox: { background:"#FFF9F0", border:`1px dashed ${gold}88`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
   weekRow: { display:"flex", gap:12, padding:"13px 0", borderTop:`1px solid ${line}` },
   weekNum: { width:34, height:34, borderRadius:9, background:`linear-gradient(135deg,${gold},${goldDeep})`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"#FFFFFF", fontSize:13, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  weekFocus: { fontWeight:700, fontSize:14, color:cream, marginBottom:5, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  weekFocus: { fontWeight:700, fontSize:14, color:"#1A1A2E", marginBottom:5, fontFamily:"'DM Sans',system-ui,sans-serif" },
   dayBlock: { padding:"12px 0", borderTop:`1px solid ${line}` },
   dayName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:16, color:gold, marginBottom:8, fontWeight:700 },
-  postRow: { background:panel2, border:`1px solid ${line}`, borderRadius:10, padding:11, marginBottom:8 },
-  postIdea: { fontSize:13.5, color:cream, fontWeight:600, lineHeight:1.5 },
+  postRow: { background:"#FAFAF8", border:`1px solid ${line}`, borderRadius:10, padding:11, marginBottom:8 },
+  postIdea: { fontSize:13.5, color:"#1A1A2E", fontWeight:600, lineHeight:1.5 },
   postFilm: { fontSize:12.5, color:mute, marginTop:5 },
   postCap: { fontSize:12.5, color:"#4A6FA5", marginTop:4 },
-  ideaText: { fontSize:14.5, color:cream, lineHeight:1.5, flex:1 },
+  ideaText: { fontSize:14.5, color:"#1A1A2E", lineHeight:1.5, flex:1 },
   ideaReact: { fontSize:13, color:mute, lineHeight:1.55, paddingLeft:22 },
   tag: { fontSize:11, padding:"3px 9px", borderRadius:7, background:panel2, color:mute, border:`1px solid ${line}`, fontWeight:600 },
   empty: { textAlign:"center", color:mute, fontSize:13.5, padding:"32px 10px", fontFamily:"'DM Sans',system-ui,sans-serif" },
