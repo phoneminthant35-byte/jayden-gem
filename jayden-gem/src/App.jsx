@@ -428,6 +428,20 @@ export default function App() {
   useEffect(() => { if (hydrated && calWeek) saveKey("jg_calWeek", calWeek); }, [calWeek, hydrated]);
   useEffect(() => { if (hydrated) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
 
+  // Auto-backup: every time app loads with real data, silently snapshot to localStorage
+  // This survives app updates — always a local copy even if Supabase fails
+  useEffect(() => {
+    if (!hydrated) return;
+    const hasData = videoLog.length > 0 || ideas.length > 0 || finalScripts.length > 0 || insights.length > 0;
+    if (!hasData) return;
+    const snapshot = {
+      exportedAt: new Date().toISOString(),
+      version: 2,
+      videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek
+    };
+    try { localStorage.setItem("jg_autobackup", JSON.stringify(snapshot)); } catch(e) {}
+  }, [hydrated]);
+
   return (
     <div style={S.app}>
       <Style />
@@ -465,7 +479,7 @@ export default function App() {
         {tab === "analytics" && <Analytics videoLog={videoLog} setVideoLog={setVideoLog} insights={insights} setInsights={setInsights} bible={bible} finalScripts={finalScripts} pendingLogs={pendingLogs} setPendingLogs={setPendingLogs} setErr={setErr} />}
         {tab === "insights" && <PageInsights pageInsights={pageInsights} setPageInsights={setPageInsights} bible={bible} setErr={setErr} />}
         {tab === "scripts" && <Scripts finalScripts={finalScripts} setFinalScripts={setFinalScripts} />}
-        {tab === "franky" && <FrankyExport videoLog={videoLog} finalScripts={finalScripts} ideas={ideas} bible={bible} pageInsights={pageInsights} />}
+        {tab === "franky" && <FrankyExport videoLog={videoLog} finalScripts={finalScripts} ideas={ideas} bible={bible} pageInsights={pageInsights} setVideoLog={setVideoLog} setFinalScripts={setFinalScripts} setIdeas={setIdeas} setBible={setBible} setPageInsights={setPageInsights} setInsights={setInsights} setCalMonth={setCalMonth} setCalWeek={setCalWeek} />}
         {tab === "bible" && <Bible bible={bible} setBible={setBible} />}
       </div>
     </div>
@@ -2478,13 +2492,63 @@ function Scripts({ finalScripts, setFinalScripts }) {
 }
 
 // ===================== FRANKY EXPORT =====================
-function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] }) {
+function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [], setVideoLog, setFinalScripts, setIdeas, setBible, setPageInsights, setInsights, setCalMonth, setCalWeek }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [restoreMsg, setRestoreMsg] = useState(null);
   const [webhookUrl, setWebhookUrl] = useState(() => {
     try { return localStorage.getItem("jg_sheets_webhook") || ""; } catch(e) { return ""; }
   });
   const [webhookInput, setWebhookInput] = useState("");
+
+  // Check for auto-backup in localStorage
+  const autoBackup = (() => {
+    try {
+      const raw = localStorage.getItem("jg_autobackup");
+      if (!raw) return null;
+      const b = JSON.parse(raw);
+      return b;
+    } catch(e) { return null; }
+  })();
+
+  function downloadBackup() {
+    const snapshot = {
+      exportedAt: new Date().toISOString(),
+      version: 2,
+      videoLog, ideas, finalScripts, insights: [], pageInsights, bible
+    };
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `jayden-gem-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setMsg("✓ Backup downloaded! Save this file somewhere safe (Google Drive, phone, email it to yourself).");
+  }
+
+  function restoreFromFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.version) throw new Error("Not a valid Jayden Gem backup file");
+        let restored = 0;
+        if (Array.isArray(data.videoLog) && data.videoLog.length > 0) { setVideoLog(data.videoLog); saveKey("jg_videoLog", data.videoLog); restored += data.videoLog.length; }
+        if (Array.isArray(data.ideas) && data.ideas.length > 0) { setIdeas(data.ideas); saveKey("jg_ideas", data.ideas); restored += data.ideas.length; }
+        if (Array.isArray(data.finalScripts) && data.finalScripts.length > 0) { setFinalScripts(data.finalScripts); saveKey("jg_finalScripts", data.finalScripts); restored += data.finalScripts.length; }
+        if (Array.isArray(data.pageInsights) && data.pageInsights.length > 0) { setPageInsights(data.pageInsights); saveKey("jg_pageInsights", data.pageInsights); }
+        if (Array.isArray(data.insights) && data.insights.length > 0) { setInsights(data.insights); saveKey("jg_insights", data.insights); }
+        if (data.bible && typeof data.bible === "string") { setBible(data.bible); saveKey("jg_bible", data.bible); }
+        if (data.calMonth) { setCalMonth(data.calMonth); saveKey("jg_calMonth", data.calMonth); }
+        if (data.calWeek) { setCalWeek(data.calWeek); saveKey("jg_calWeek", data.calWeek); }
+        setRestoreMsg(`✓ Restored ${restored} entries from backup (${data.exportedAt?.slice(0,10) || "unknown date"}). Check your tabs — everything should be back.`);
+      } catch(err) {
+        setRestoreMsg("✗ Could not read that file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
 
   const today = new Date();
   const day = today.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
@@ -2560,6 +2624,46 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
       <Eyebrow>Franky Export</Eyebrow>
       <h2 style={S.h2}>🔧 Franky updates your master log</h2>
       <p style={S.lede}>Franky packages everything — video log, page insights, scripts, ideas, and Brand Bible — into one Excel file. Set up the Google Sheets webhook once and Franky pushes everything there automatically.</p>
+
+      {/* ── BACKUP & RESTORE — always at the top ── */}
+      <Card accent>
+        <div style={{ fontWeight:700, fontSize:15, color:"#1A1A2E", marginBottom:4 }}>🛡️ Backup & Restore</div>
+        <p style={{ ...S.subtle, marginBottom:12 }}>Download a JSON backup of ALL your data. If anything ever goes wrong after an update, drag the file back in to restore everything instantly.</p>
+
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:12 }}>
+          <button style={S.gold} onClick={downloadBackup}>
+            ⬇️ Download backup now
+          </button>
+          <div style={{ fontSize:12, color:mute, alignSelf:"center" }}>
+            {videoLog.length} videos · {ideas.length} ideas · {finalScripts.length} scripts
+          </div>
+        </div>
+
+        {/* Auto-backup status */}
+        {autoBackup && (
+          <div style={{ fontSize:12, color:"#2D8A5E", marginBottom:10, background:"#F0FFF8", borderRadius:7, padding:"6px 10px", border:"1px solid #A5D6A7" }}>
+            ✓ Auto-backup saved locally — {autoBackup.exportedAt?.slice(0,10)} · {autoBackup.videoLog?.length||0} videos · {autoBackup.ideas?.length||0} ideas
+          </div>
+        )}
+
+        {/* Restore from file */}
+        <div style={{ borderTop:`1px solid #E2DDD6`, paddingTop:12, marginTop:4 }}>
+          <div style={{ fontSize:12.5, fontWeight:700, color:"#1A1A2E", marginBottom:6 }}>↩️ Restore from backup file</div>
+          <div style={{ fontSize:12, color:mute, marginBottom:8 }}>Drag your .json backup file here, or click to pick it.</div>
+          <input type="file" accept=".json,application/json"
+            style={{ fontSize:12.5, color:"#1A1A2E" }}
+            onChange={e => restoreFromFile(e.target.files?.[0])} />
+          {restoreMsg && (
+            <div style={{ marginTop:8, fontSize:13, color: restoreMsg.startsWith("✓") ? "#2D8A5E" : "#C0392B",
+              background: restoreMsg.startsWith("✓") ? "#F0FFF8" : "#FFF0F0",
+              borderRadius:8, padding:"8px 12px", border:`1px solid ${restoreMsg.startsWith("✓") ? "#A5D6A7" : "#F5C6CB"}` }}>
+              {restoreMsg}
+            </div>
+          )}
+        </div>
+
+        {msg && <div style={{ marginTop:8, fontSize:13, color:"#2D8A5E" }}>{msg}</div>}
+      </Card>
 
       {/* Google Sheets auto-push setup */}
       <Card accent>
