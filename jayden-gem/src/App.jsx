@@ -297,7 +297,7 @@ function SpeedControl() {
           </button>
         ))}
         <div style={{ display:"flex", alignItems:"center", gap:5, marginLeft:"auto" }}>
-          <span style={{ fontSize:11, color:"#1A1A2E" }}>Custom:</span>
+          <span style={{ fontSize:11, color:"#6B6560" }}>Custom:</span>
           <input
             type="number" min="0.5" max="2.0" step="0.05"
             placeholder="1.3"
@@ -439,9 +439,9 @@ export default function App() {
       <Header tab={tab} setTab={setTab} syncStatus={syncStatus} />
       {err && <div style={S.err}>⚠️ <b>Something went wrong:</b> {err} <button style={S.linkBtn} onClick={() => setErr(null)}>dismiss</button></div>}
       {storageWarning && (
-        <div style={{ maxWidth:800, margin:"10px auto 0", background:"#FFFBEA", color:"#3A2500", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #6B541888", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+        <div style={{ maxWidth:800, margin:"10px auto 0", background:"#1A1400", color:"#F0D27A", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #6B541888", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <span>🔧 <b>Franky says:</b> Storage getting full — run your weekly export and old entries will auto-trim to stay healthy.</span>
-          <button style={{ ...S.linkBtn, color:"#8B5E0A" }} onClick={() => setTab("franky")}>Go to Export →</button>
+          <button style={{ ...S.linkBtn, color:"#F0D27A" }} onClick={() => setTab("franky")}>Go to Export →</button>
         </div>
       )}
       <div style={S.main}>
@@ -645,12 +645,12 @@ function CrewView() {
   return (
     <div>
       <div style={{ textAlign:"center", padding:"24px 0 20px" }}>
-        <div style={{ fontSize:12, letterSpacing:3, textTransform:"uppercase", color:"#7A5000", fontFamily:"'DM Sans',system-ui,sans-serif", marginBottom:8 }}>⚓ Grand Line Marketing Crew ⚓</div>
-        <h1 style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:26, fontWeight:900, color:"#1A1A2E", margin:"0 0 6px", lineHeight:1.1 }}>MUGIWARA<br/><span style={{ fontSize:18, color:"#7A5000" }}>JEWELRY PIRATES</span></h1>
-        <p style={{ fontSize:13.5, color:"#1A1A2E", lineHeight:1.6, maxWidth:460, margin:"8px auto 0" }}>Five nakama. One mission: dominate the Myanmar jewelry FYP and make <b style={{ color:"#1A1A2E" }}>Jayden Gem</b> the most legendary piece on the Grand Line.</p>
+        <div style={{ fontSize:12, letterSpacing:3, textTransform:"uppercase", color:"#D4AF37", fontFamily:"'DM Sans',system-ui,sans-serif", marginBottom:8 }}>⚓ Grand Line Marketing Crew ⚓</div>
+        <h1 style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:26, fontWeight:900, color:"#1A1A2E", margin:"0 0 6px", lineHeight:1.1 }}>MUGIWARA<br/><span style={{ fontSize:18, color:"#D4AF37" }}>JEWELRY PIRATES</span></h1>
+        <p style={{ fontSize:13.5, color:"#6B7280", lineHeight:1.6, maxWidth:460, margin:"8px auto 0" }}>Five nakama. One mission: dominate the Myanmar jewelry FYP and make <b style={{ color:"#1A1A2E" }}>Jayden Gem</b> the most legendary piece on the Grand Line.</p>
         <div style={{ display:"flex", alignItems:"center", gap:10, margin:"16px auto 0", maxWidth:400 }}>
           <div style={{ flex:1, height:1, background:"linear-gradient(90deg,transparent,#D4AF3766,transparent)" }}/>
-          <span style={{ color:"#7A5000", fontSize:18 }}>☠</span>
+          <span style={{ color:"#D4AF37", fontSize:18 }}>☠</span>
           <div style={{ flex:1, height:1, background:"linear-gradient(90deg,transparent,#D4AF3766,transparent)" }}/>
         </div>
       </div>
@@ -659,32 +659,32 @@ function CrewView() {
         {Object.entries(CREW).map(([k, m]) => {
           const Portrait = PORTRAITS[k];
           const badges = { luffy:"👑 CAPTAIN", robin:"🔮 ARCHAEOLOGIST", usopp:"✍️ SNIPER", nami:"📊 NAVIGATOR", franky:"🔧 SHIPWRIGHT" };
-          const badgeColors = { luffy:["#FFF3E0","#8B5E0A","#C8922A"], robin:["#F3EEFF","#6B3AAA","#9B6BD6"], usopp:["#FDF0F2","#882040","#E0556B"], nami:["#E8F5EE","#1A6B45","#3FA37A"], franky:["#E8F2FB","#1A5FA0","#3E86C4"] };
+          const badgeColors = { luffy:["#3A2E10","#F0D27A","#6B5418"], robin:["#1C0A3A","#C9A4F0","#6B4AB8"], usopp:["#2A0A0A","#F2929F","#882040"], nami:["#0A1A0A","#7FD3AE","#206040"], franky:["#0A1020","#84B8E6","#204080"] };
           const [bg, fg, border] = badgeColors[k];
           return (
-            <div key={k} className="crew-card-inner" style={{ background:"#FFFFFF", border:`1.5px solid ${m.gem}44`, borderRadius:18, padding:18, position:"relative", overflow:"hidden", transition:"transform 0.2s ease" }}>
+            <div key={k} className="crew-card-inner" style={{ background:`linear-gradient(145deg,#161E40,#0E1430)`, border:`1.5px solid ${m.gem}44`, borderRadius:18, padding:18, position:"relative", overflow:"hidden", transition:"transform 0.2s ease" }}>
               <div style={{ position:"absolute", top:0, right:0, width:60, height:60, background:`radial-gradient(circle at top right,${m.gem}22,transparent)`, borderRadius:"0 18px 0 0" }}/>
               <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:12 }}>
                 <Portrait size={54} />
                 <div>
                   <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#1A1A2E", letterSpacing:0.3 }}>{m.name}</div>
-                  <div style={{ fontSize:11, fontWeight:600, color:m.gem, marginTop:2, letterSpacing:0.5 }}>{m.role.toUpperCase()}</div>
+                  <div style={{ fontSize:11, fontWeight:600, color:m.facet, marginTop:2, letterSpacing:0.5 }}>{m.role.toUpperCase()}</div>
                   <span style={{ display:"inline-block", marginTop:5, fontSize:10, background:bg, color:fg, border:`1px solid ${border}`, borderRadius:5, padding:"1px 6px", fontWeight:700 }}>{badges[k]}</span>
                 </div>
               </div>
-              <div style={{ fontSize:13, color:"#1A1A2E", lineHeight:1.55, borderTop:`1px solid ${m.gem}33`, paddingTop:10 }}>{m.blurb}</div>
+              <div style={{ fontSize:13, color:"#6B7280", lineHeight:1.55, borderTop:`1px solid ${m.gem}33`, paddingTop:10 }}>{m.blurb}</div>
               <div style={{ height:2, background:`linear-gradient(90deg,transparent,${m.gem},transparent)`, borderRadius:2, marginTop:12, opacity:0.5 }}/>
             </div>
           );
         })}
       </div>
 
-      <div style={{ marginTop:22, background:"#F5F2EE", border:"1px solid #D4AF3733", borderRadius:16, padding:20 }}>
-        <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:12, color:"#7A5000", letterSpacing:2, marginBottom:12 }}>📋 SHIP'S LOG — HOW THE CREW OPERATES</div>
+      <div style={{ marginTop:22, background:"linear-gradient(135deg,#161E40,#0E1430)", border:"1px solid #D4AF3733", borderRadius:16, padding:20 }}>
+        <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:12, color:"#D4AF37", letterSpacing:2, marginBottom:12 }}>📋 SHIP'S LOG — HOW THE CREW OPERATES</div>
         {[["🔮 Robin scouts","Finds hot celebrity jewelry trends — global + Myanmar FYP"],["⚔️ Crew debates","5 rounds of Robin vs Nami vs Usopp — best angle wins"],["👑 Luffy decides","Captain breaks deadlocks and gives the final directive"],["✋ You approve","Boss has final say — approve or send back with notes"],["✍️ Usopp writes","Scripts, shoot guide, CapCut guide, caption — all 5 accounts"],["📊 Nami analyzes","Reads your video stats cold — teaches the crew what works"],["🔧 Franky logs","Exports everything to your master Excel twice a week"]].map(([step,desc])=>(
           <div key={step} style={{ display:"flex", gap:12, alignItems:"start", padding:"8px 0", borderTop:"1px solid #2A335C44" }}>
             <div style={{ fontSize:13, fontWeight:700, color:"#1A1A2E", minWidth:130, flexShrink:0 }}>{step}</div>
-            <div style={{ fontSize:13, color:"#1A1A2E", lineHeight:1.5 }}>{desc}</div>
+            <div style={{ fontSize:13, color:"#6B7280", lineHeight:1.5 }}>{desc}</div>
           </div>
         ))}
       </div>
@@ -823,16 +823,16 @@ function Strategy({ bible, insights, videoLog, setErr }) {
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
                 <div style={{ background:panel2, borderRadius:10, padding:12, border:`1px solid ${a.color}33` }}>
                   <div style={{ fontSize:11, fontWeight:700, color:a.color, letterSpacing:1, marginBottom:8, fontFamily:"'DM Sans',system-ui,sans-serif" }}>🪝 HOOKS THAT PULL THEM</div>
-                  {a.hooks.map(h => <div key={h} style={{ fontSize:12.5, color:"#1A1A2E", marginBottom:5, paddingLeft:10, borderLeft:`2px solid ${a.color}55` }}>"{h}"</div>)}
+                  {a.hooks.map(h => <div key={h} style={{ fontSize:12.5, color:"#D5D3E0", marginBottom:5, paddingLeft:10, borderLeft:`2px solid ${a.color}55` }}>"{h}"</div>)}
                 </div>
                 <div style={{ background:panel2, borderRadius:10, padding:12, border:`1px solid ${a.color}33` }}>
                   <div style={{ fontSize:11, fontWeight:700, color:a.color, letterSpacing:1, marginBottom:8, fontFamily:"'DM Sans',system-ui,sans-serif" }}>📹 BEST FORMATS</div>
-                  {a.formats.map(f => <div key={f} style={{ fontSize:12.5, color:"#1A1A2E", marginBottom:5, paddingLeft:10, borderLeft:`2px solid ${a.color}55` }}>{f}</div>)}
+                  {a.formats.map(f => <div key={f} style={{ fontSize:12.5, color:"#D5D3E0", marginBottom:5, paddingLeft:10, borderLeft:`2px solid ${a.color}55` }}>{f}</div>)}
                 </div>
               </div>
-              <div style={{ background:"#FDF0F2", borderRadius:10, padding:10, border:"1px solid #E0556B" }}>
-                <span style={{ fontSize:11, fontWeight:700, color:"#B03060", letterSpacing:1 }}>⚠️ AVOID: </span>
-                <span style={{ fontSize:13, color:"#B03060" }}>{a.avoid}</span>
+              <div style={{ background:"#2A0A0A", borderRadius:10, padding:10, border:"1px solid #882040" }}>
+                <span style={{ fontSize:11, fontWeight:700, color:"#F2929F", letterSpacing:1 }}>⚠️ AVOID: </span>
+                <span style={{ fontSize:13, color:"#F2929F" }}>{a.avoid}</span>
               </div>
             </div>
           );
@@ -893,7 +893,7 @@ function Strategy({ bible, insights, videoLog, setErr }) {
                   <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream }}>{st.type}</div>
                   <span style={{ fontSize:10.5, background:"#FFF3E0", color:gold, border:"1px solid #C8922A44", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>{st.trigger}</span>
                 </div>
-                <div style={{ fontSize:13.5, color:"#1A1A2E", lineHeight:1.6, marginBottom:8 }}>{st.desc}</div>
+                <div style={{ fontSize:13.5, color:"#C9D2F0", lineHeight:1.6, marginBottom:8 }}>{st.desc}</div>
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                   {st.examples.map(e => (
                     <span key={e} style={{ fontSize:12, background:panel2, color:"#4A6FA5", border:`1px solid ${line}`, borderRadius:8, padding:"4px 10px", fontStyle:"italic" }}>"{e}"</span>
@@ -910,7 +910,7 @@ function Strategy({ bible, insights, videoLog, setErr }) {
         <div style={S.cardTitle}>🔮 The 3 content layers — your cult-building formula</div>
         <p style={{ ...S.subtle, marginBottom:14 }}>Every week should have content from all three. If you only post jewelry, you have an account. If you mix all three, you build a cult.</p>
         {[
-          { n:"1", title:"Jewelry Layer", color:"#7A5000", pct:"40%", desc:"The expertise that makes you credible. Price shocks, gem knowledge, celebrity pieces, engineering facts. This is why people trust you.", signal:"High saves, female audience, search traffic" },
+          { n:"1", title:"Jewelry Layer", color:"#D4AF37", pct:"40%", desc:"The expertise that makes you credible. Price shocks, gem knowledge, celebrity pieces, engineering facts. This is why people trust you.", signal:"High saves, female audience, search traffic" },
           { n:"2", title:"Personality Layer", color:"#E0556B", pct:"35%", desc:"The real Jayden. Opinions, humor, reactions, hot takes. This is what makes people stay after the first video. No personality = no cult.", signal:"High watch time, comments, controversy shares" },
           { n:"3", title:"Parasocial Bridge", color:"#9B6BD6", pct:"25%", desc:"The connection that makes them loyal. Day in your life, behind the scenes, DM them back on Stories. This converts followers into fans.", signal:"DMs, story replies, 'feel like I know you' comments" },
         ].map(l => (
@@ -921,7 +921,7 @@ function Strategy({ bible, insights, videoLog, setErr }) {
                 <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream }}>{l.title}</div>
                 <span style={{ fontSize:11, background:`${l.color}22`, color:l.color, borderRadius:5, padding:"1px 7px", fontWeight:700 }}>{l.pct} of posts</span>
               </div>
-              <div style={{ fontSize:13.5, color:"#1A1A2E", lineHeight:1.6, marginBottom:6 }}>{l.desc}</div>
+              <div style={{ fontSize:13.5, color:"#C9D2F0", lineHeight:1.6, marginBottom:6 }}>{l.desc}</div>
               <div style={{ fontSize:12, color:mute }}><b style={{ color:l.color }}>Success signal:</b> {l.signal}</div>
             </div>
           </div>
@@ -1104,7 +1104,7 @@ function Studio({ bible, insights, finalScripts = [], studioSeed = "", setStudio
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:6, flexShrink:0 }}>
                 <button style={S.ghost} disabled={busy} onClick={()=>debateTopic(t)}>Debate →</button>
-                <button style={{ ...S.ghost, fontSize:11.5, padding:"5px 10px", color:"#8B5E0A", borderColor:"#C8922A66" }}
+                <button style={{ ...S.ghost, fontSize:11.5, padding:"5px 10px", color:"#F0D27A", borderColor:"#6B541888" }}
                   onClick={()=>{
                     const ideaText = `${t.celebrity} — ${t.piece} (${t.hookType})`;
                     setIdeas([{ id:Date.now(), text:ideaText, plan:null, date:new Date().toISOString().slice(0,10) }, ...ideas]);
@@ -1175,7 +1175,7 @@ function Studio({ bible, insights, finalScripts = [], studioSeed = "", setStudio
             <div style={{ display:"flex", gap:8, flexWrap:"wrap", margin:"10px 0 14px" }}>
               {Object.entries(ACCOUNTS).map(([k,a])=>(
                 <button key={k} onClick={()=>setPicked({ ...picked,[k]:!picked[k] })}
-                  style={{ ...S.chip, ...(picked[k]?{ background:a.color, color:"#FFFFFF", borderColor:a.color }:{}) }}>{a.label}</button>
+                  style={{ ...S.chip, ...(picked[k]?{ background:a.color, color:"#0E1430", borderColor:a.color }:{}) }}>{a.label}</button>
               ))}
             </div>
             <button style={S.gold} disabled={busy} onClick={approveWrite}>
@@ -1187,7 +1187,7 @@ function Studio({ bible, insights, finalScripts = [], studioSeed = "", setStudio
             </div>
             {/* Save to Ideas — for when you like it but aren't ready to shoot */}
             <div style={{ marginTop:10 }}>
-              <button style={{ ...S.ghost, fontSize:12.5, color:"#8B5E0A", borderColor:"#C8922A66" }} onClick={() => {
+              <button style={{ ...S.ghost, fontSize:12.5, color:"#F0D27A", borderColor:"#6B541888" }} onClick={() => {
                 if (!verdict || !setIdeas) return;
                 const ideaText = `${verdict.finalTopic || (verdict.topic?.celebrity+" — "+verdict.topic?.piece)} · ${verdict.hookType} · Luffy: "${verdict.directive}"`;
                 setIdeas([{ id:Date.now(), text:ideaText, plan:null, date:new Date().toISOString().slice(0,10) }, ...(ideas||[])]);
@@ -1406,7 +1406,7 @@ function Calendar({ bible, insights, calMonth, setCalMonth, calWeek, setCalWeek,
                             <button style={{ ...S.ghost, fontSize:11.5, padding:"5px 11px",
                                 color: savedPosts[key] ? "#7FD3AE" : "#F0D27A",
                                 borderColor: savedPosts[key] ? "#206040" : "#6B541866",
-                                background: savedPosts[key] ? "#E8F5EE" : "transparent" }}
+                                background: savedPosts[key] ? "#0A1A0A" : "transparent" }}
                               onClick={()=>{
                                 if (savedPosts[key]) return;
                                 setIdeas(prev => [{ id:Date.now(), text:`${p.account} — ${p.idea} (${p.format}, ${d.day})`, plan:null, date:new Date().toISOString().slice(0,10) }, ...prev]);
@@ -1463,7 +1463,7 @@ function Calendar({ bible, insights, calMonth, setCalMonth, calWeek, setCalWeek,
 // ===================== IDEAS =====================
 function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
   const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busyId, setBusyId] = useState(null); // tracks which specific idea is being debated/discussed
   const [activeIdea, setActiveIdea] = useState(null);
   const [sentToStudio, setSentToStudio] = useState({}); // tracks which ideas were sent to Studio
 
@@ -1481,26 +1481,26 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
 
   async function debateNow(id) {
     const idea = ideas.find(x=>x.id===id); if (!idea) return;
-    setErr(null); setBusy(true);
+    setErr(null); setBusyId(id);
     try {
-      const sys = ctx(bible) + "\nThe crew (Robin, Nami, Usopp) reacts to the boss idea, then Luffy turns it into a plan. Be specific.";
+      const sys = ctx(bible) + "\nThe crew (Robin, Nami, Usopp) reacts to the boss idea, then Luffy turns it into a plan. Be specific. CRITICAL: Respond in natural conversational language. Do NOT use One Piece or anime references.";
       const usr = `Boss idea: "${idea.text}".\nReturn ONLY JSON: {"reactions":[{"who":"Nico Robin","text":""},{"who":"Nami","text":""},{"who":"Usopp","text":""}],"verdict":"Luffy call","bestAccount":"","hook":"","action":"one next step"}.`;
       const plan = await ask(sys, usr, true);
       setIdeas(ideas.map(x=>x.id===id?{ ...x, plan }:x));
     } catch(e){ setErr(e.message); }
-    setBusy(false);
+    setBusyId(null);
   }
 
   async function discussIdea(idea, note) {
     if (!note.trim()) return;
-    setBusy(true);
+    setBusyId(idea.id);
     try {
       const sys = ctx(bible) + "\nYou are Luffy + the crew discussing a saved idea with the boss. Be specific and direct. 3-4 sentences max.";
       const usr = `Idea: "${idea.text}"\nBoss says: "${note}"\nRespond directly to the boss's note about this idea.`;
       const reply = await ask(sys, usr, false, 600);
       setActiveIdea(prev => ({ ...prev, reply, note:"" }));
     } catch(e){ setErr(e.message); }
-    setBusy(false);
+    setBusyId(null);
   }
 
   function saveToScripts(idea) {
@@ -1535,14 +1535,14 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                 </button>
                 {!idea.plan && (
                   <button style={{ ...S.ghost, fontSize:12, padding:"6px 12px",
-                    color: busy ? mute : cream,
-                    borderColor: busy ? line : undefined }}
-                    disabled={busy} onClick={()=>debateNow(idea.id)}>
-                    {busy ? "Debating…" : "⚔️ Quick debate"}
+                    color: busyId===idea.id ? mute : cream,
+                    borderColor: busyId===idea.id ? line : undefined }}
+                    disabled={busyId===idea.id} onClick={()=>debateNow(idea.id)}>
+                    {busyId===idea.id ? "Debating…" : "⚔️ Quick debate"}
                   </button>
                 )}
                 {idea.plan && (
-                  <button style={{ ...S.ghost, fontSize:12, padding:"6px 12px", color:"#1A7A4A", borderColor:"#3FA37A", background:"#E8F5EE" }} disabled>
+                  <button style={{ ...S.ghost, fontSize:12, padding:"6px 12px", color:"#7FD3AE", borderColor:"#206040", background:"#0A1A0A" }} disabled>
                     ✓ Debated
                   </button>
                 )}
@@ -1570,9 +1570,9 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                   placeholder='e.g. "Which account should this go on?" or "What hook should I use?"'
                   value={activeIdea.note||""}
                   onChange={e=>setActiveIdea(prev=>({...prev, note:e.target.value}))} />
-                <button style={{ ...S.gold, marginTop:6, fontSize:12 }} disabled={busy}
+                <button style={{ ...S.gold, marginTop:6, fontSize:12 }} disabled={busyId===idea.id}
                   onClick={()=>discussIdea(idea, activeIdea.note||"")}>
-                  {busy?"…":"Send to crew"}
+                  {busyId===idea.id?"…":"Send to crew"}
                 </button>
               </div>
             )}
@@ -1582,7 +1582,7 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                 {(idea.plan.reactions||[]).map((r,i)=>{
                   const m = Object.values(CREW).find(c=>c.name===r.who) || CREW.robin;
                   return <div key={i} style={{ marginBottom:8 }}>
-                    <span style={{ color:m.gem, fontWeight:600, fontSize:13 }}>{m.icon} {r.who}</span>
+                    <span style={{ color:m.facet, fontWeight:600, fontSize:13 }}>{m.icon} {r.who}</span>
                     <div style={S.ideaReact}>{r.text}</div>
                   </div>;
                 })}
@@ -1592,7 +1592,7 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                     <Tag gold>{idea.plan.bestAccount}</Tag><Tag>{idea.plan.hook}</Tag>
                   </div>
                   <div style={S.directive}><b>Next step:</b> {idea.plan.action}</div>
-                  <button style={{ ...S.ghost, marginTop:10, fontSize:12, padding:"6px 12px", color:"#8B5E0A", borderColor:"#C8922A66" }} onClick={()=>sendToStudio(idea)}>✍️ Take to Studio — full script</button>
+                  <button style={{ ...S.ghost, marginTop:10, fontSize:12, padding:"6px 12px", color:"#F0D27A", borderColor:"#6B541888" }} onClick={()=>sendToStudio(idea)}>✍️ Take to Studio — full script</button>
                 </div>
               </div>
             )}
@@ -1750,7 +1750,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
                         <Tag>{v.platform}</Tag>
                         <Tag>{v.date}</Tag>
                         {v.updated && <Tag>updated {v.updated}</Tag>}
-                        {needsUpdate && <span style={{ fontSize:11, background:"#FDF0F2", color:"#B03060", border:"1px solid #E0556B", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>⚠️ Due for day 3 update</span>}
+                        {needsUpdate && <span style={{ fontSize:11, background:"#2A0A0A", color:"#F2929F", border:"1px solid #882040", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>⚠️ Due for day 3 update</span>}
                       </div>
                       <div style={{ fontSize:12.5, color:mute }}>
                         👁 {Number(v.views||0).toLocaleString()} views · ⏱ {v.watch}s · ✅ {v.completion}% · ❤️ {v.likes} · ↗️ {v.shares} shares
@@ -1761,7 +1761,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
                       <div style={{ fontSize:9.5, color:mute }}>SCORE</div>
                     </div>
                   </div>
-                  <div style={{ marginTop:8, fontSize:12, color:"#1A5FA0", fontWeight:600 }}>
+                  <div style={{ marginTop:8, fontSize:12, color:"#84B8E6", fontWeight:600 }}>
                     Tap to update stats →
                   </div>
                 </div>
@@ -1790,7 +1790,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
                     {p.saves&&<span>🔖 {p.saves} saves · </span>}
                     {p.newFollowers!==undefined&&<span>👤 {p.newFollowers} new followers</span>}
                   </div>
-                  {p.claudeNote&&<div style={{ fontSize:12.5, color:"#6B3AAA", marginTop:6, fontStyle:"italic" }}>💬 {p.claudeNote}</div>}
+                  {p.claudeNote&&<div style={{ fontSize:12.5, color:"#C9A4F0", marginTop:6, fontStyle:"italic" }}>💬 {p.claudeNote}</div>}
                 </div>
                 <div style={{ display:"flex", gap:6, flexDirection:"column", flexShrink:0 }}>
                   <button style={{ ...S.gold, fontSize:12, padding:"7px 14px" }} onClick={()=>{
@@ -1837,9 +1837,9 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
         const last = videoLog[0];
         const loggedAt = last.loggedAt ? new Date(last.loggedAt).toLocaleString() : last.date;
         return (
-          <div style={{ background:"#E8F5EE", border:"1px solid #3FA37A", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
+          <div style={{ background:"#0A1A0A", border:"1px solid #206040", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
             <div>
-              <div style={{ fontSize:11, color:"#1A7A4A", fontWeight:700, letterSpacing:1, marginBottom:2 }}>✓ LAST LOGGED</div>
+              <div style={{ fontSize:11, color:"#7FD3AE", fontWeight:700, letterSpacing:1, marginBottom:2 }}>✓ LAST LOGGED</div>
               <div style={{ fontSize:13.5, color:cream, fontWeight:600 }}>{last.title || "(untitled)"}</div>
               <div style={{ fontSize:12, color:mute, marginTop:2 }}>{last.account} · {last.views ? Number(last.views).toLocaleString()+" views" : ""} · {loggedAt}</div>
             </div>
@@ -1868,7 +1868,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
             accept="image/*"
             multiple
             disabled={reading}
-            style={{ color:"#1A1A2E", fontSize:13, width:"100%", marginBottom:10 }}
+            style={{ color:"#C9D2F0", fontSize:13, width:"100%", marginBottom:10 }}
             onChange={async (e) => {
               const files = e.target.files;
               if (!files || files.length === 0) return;
@@ -1988,7 +1988,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
                     </>
                   )}
                 </select>
-                {f.script && <div style={{ fontSize:11, color:"#1A7A4A", marginTop:4 }}>✓ Script loaded — you can edit below if needed</div>}
+                {f.script && <div style={{ fontSize:11, color:"#7FD3AE", marginTop:4 }}>✓ Script loaded — you can edit below if needed</div>}
               </div>
             )}
 
@@ -2005,7 +2005,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
         {editId && f.script && (
           <div style={{ marginTop:12 }}>
             <div style={{ fontSize:11, color:gold, fontWeight:700, letterSpacing:1.5, marginBottom:4, textTransform:"uppercase" }}>
-              📜 Script <span style={{ color:"#1A7A4A", fontWeight:400, fontSize:10, textTransform:"none" }}>✓ from day 1 — no changes needed</span>
+              📜 Script <span style={{ color:"#7FD3AE", fontWeight:400, fontSize:10, textTransform:"none" }}>✓ from day 1 — no changes needed</span>
             </div>
             <div style={{ ...S.briefBox, fontSize:12.5, color:mute, lineHeight:1.5, maxHeight:80, overflow:"hidden", opacity:0.7 }}>
               {f.script.slice(0,200)}{f.script.length>200?"…":""}
@@ -2128,13 +2128,13 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
             <Tag gold>{v.ai.viral}</Tag><Tag>DM {v.ai.dmConv}</Tag><Tag>{v.ai.trend}</Tag>
           </div>
           <div style={{ marginTop:10, fontSize:13.5, lineHeight:1.6 }}>
-            <div style={{ color:"#1A7A4A" }}><b>✓ Worked:</b> {(v.ai.worked||[]).join("; ")}</div>
-            <div style={{ color:"#B03060", marginTop:3 }}><b>△ Improve:</b> {(v.ai.improve||[]).join("; ")}</div>
-            <div style={{ color:"#8B5E0A", marginTop:3 }}><b>→ Next:</b> {v.ai.nextTopic}</div>
-            {v.ai.audienceNote && <div style={{ color:"#6B3AAA", marginTop:3 }}><b>👥 Audience:</b> {v.ai.audienceNote}</div>}
-            {v.ai.momentumNote && <div style={{ color:"#1A5FA0", marginTop:3 }}><b>📈 Momentum:</b> {v.ai.momentumNote}</div>}
-            {v.ai.scriptNote && <div style={{ color:"#8B5E0A", marginTop:3 }}><b>📜 Script insight:</b> {v.ai.scriptNote}</div>}
-            {v.ai.commentInsight && <div style={{ color:"#1A7A4A", marginTop:3 }}><b>💬 Comments/Search:</b> {v.ai.commentInsight}</div>}
+            <div style={{ color:"#7FD3AE" }}><b>✓ Worked:</b> {(v.ai.worked||[]).join("; ")}</div>
+            <div style={{ color:"#F2929F", marginTop:3 }}><b>△ Improve:</b> {(v.ai.improve||[]).join("; ")}</div>
+            <div style={{ color:"#F0D27A", marginTop:3 }}><b>→ Next:</b> {v.ai.nextTopic}</div>
+            {v.ai.audienceNote && <div style={{ color:"#C9A4F0", marginTop:3 }}><b>👥 Audience:</b> {v.ai.audienceNote}</div>}
+            {v.ai.momentumNote && <div style={{ color:"#84B8E6", marginTop:3 }}><b>📈 Momentum:</b> {v.ai.momentumNote}</div>}
+            {v.ai.scriptNote && <div style={{ color:"#F0D27A", marginTop:3 }}><b>📜 Script insight:</b> {v.ai.scriptNote}</div>}
+            {v.ai.commentInsight && <div style={{ color:"#7FD3AE", marginTop:3 }}><b>💬 Comments/Search:</b> {v.ai.commentInsight}</div>}
           </div>
           {/* Notes — white sticky-note style */}
           {(v.notes || (v.noteImages && v.noteImages.length>0)) && (
@@ -2292,7 +2292,7 @@ function PageInsights({ pageInsights, setPageInsights, bible, setErr }) {
             accept="image/*"
             multiple
             disabled={reading}
-            style={{ color:"#1A1A2E", fontSize:13, width:"100%", marginBottom:10 }}
+            style={{ color:"#C9D2F0", fontSize:13, width:"100%", marginBottom:10 }}
             onChange={async (e)=>{
               const files = Array.from(e.target.files||[]).slice(0,4);
               if (!files.length) return;
@@ -2377,10 +2377,10 @@ function PageInsights({ pageInsights, setPageInsights, bible, setErr }) {
               </div>
               <div style={{ fontSize:13, color:cream, marginTop:6 }}>
                 👥 {Number(p.followers||0).toLocaleString()} followers
-                {p.followerGrowth && <span style={{ color:"#1A7A4A", marginLeft:8 }}>+{p.followerGrowth} this week</span>}
+                {p.followerGrowth && <span style={{ color:"#7FD3AE", marginLeft:8 }}>+{p.followerGrowth} this week</span>}
                 {p.profileViews && <span style={{ color:mute, marginLeft:8 }}>👁 {Number(p.profileViews).toLocaleString()} views</span>}
               </div>
-              {p.ai?.insight && <div style={{ fontSize:12.5, color:"#6B3AAA", marginTop:4 }}>💡 {p.ai.insight}</div>}
+              {p.ai?.insight && <div style={{ fontSize:12.5, color:"#C9A4F0", marginTop:4 }}>💡 {p.ai.insight}</div>}
             </div>
           ))}
         </Card>
@@ -2565,19 +2565,19 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
       <Card accent>
         <div style={{ fontWeight:700, fontSize:14, color:cream, marginBottom:4 }}>
           📊 Google Sheets auto-push
-          {webhookUrl && <span style={{ color:"#1A7A4A", fontSize:12, fontWeight:400, marginLeft:8 }}>✓ Connected</span>}
+          {webhookUrl && <span style={{ color:"#7FD3AE", fontSize:12, fontWeight:400, marginLeft:8 }}>✓ Connected</span>}
         </div>
         <p style={{ ...S.subtle, marginBottom:10 }}>Set this up once and Franky automatically pushes all your data to Google Sheets every time you export.</p>
         {!webhookUrl ? (
           <div>
             <div style={{ fontSize:12.5, color:cream, lineHeight:1.8, marginBottom:10 }}>
-              <b style={{ color:gold }}>Step 1</b> — Open your Google Sheet: <a href="https://docs.google.com/spreadsheets/d/1fe0691PyR7bN4B6LpFS6AshyZt35LjQpWRWdRV6efoU/edit" target="_blank" rel="noreferrer" style={{ color:"#1A5FA0" }}>Jayden Gem Master Log</a><br/>
+              <b style={{ color:gold }}>Step 1</b> — Open your Google Sheet: <a href="https://docs.google.com/spreadsheets/d/1fe0691PyR7bN4B6LpFS6AshyZt35LjQpWRWdRV6efoU/edit" target="_blank" rel="noreferrer" style={{ color:"#84B8E6" }}>Jayden Gem Master Log</a><br/>
               <b style={{ color:gold }}>Step 2</b> — Click <b style={{ color:cream }}>Extensions → Apps Script</b><br/>
               <b style={{ color:gold }}>Step 3</b> — Delete everything and paste the script below<br/>
               <b style={{ color:gold }}>Step 4</b> — Click Deploy → New deployment → Web App → Anyone can access → Deploy<br/>
               <b style={{ color:gold }}>Step 5</b> — Copy the Web App URL and paste below
             </div>
-            <div style={{ background:"#2D3748", borderRadius:8, padding:10, marginBottom:10, fontSize:11.5, fontFamily:"monospace", color:"#1A5FA0", lineHeight:1.6, overflowX:"auto" }}>
+            <div style={{ background:"#2D3748", borderRadius:8, padding:10, marginBottom:10, fontSize:11.5, fontFamily:"monospace", color:"#84B8E6", lineHeight:1.6, overflowX:"auto" }}>
               {`function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -2621,7 +2621,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
           </div>
         ) : (
           <div>
-            <div style={{ fontSize:13, color:"#1A7A4A", marginBottom:8 }}>✓ Every time Franky exports, your Google Sheet updates automatically.</div>
+            <div style={{ fontSize:13, color:"#7FD3AE", marginBottom:8 }}>✓ Every time Franky exports, your Google Sheet updates automatically.</div>
             <button style={{ ...S.ghost, fontSize:12 }} onClick={()=>{ 
               try { localStorage.removeItem("jg_sheets_webhook"); } catch(e) {}
               setWebhookUrl(""); 
@@ -2635,7 +2635,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
           <div style={{ fontSize:48, marginBottom:12 }}>🔧</div>
           {isExportDay ? (
             <>
-              <div style={{ color:"#1A7A4A", fontWeight:700, fontSize:15, marginBottom:6 }}>Today is export day — Franky is ready!</div>
+              <div style={{ color:"#7FD3AE", fontWeight:700, fontSize:15, marginBottom:6 }}>Today is export day — Franky is ready!</div>
               <div style={S.subtle}>Your log has {videoLog.length} videos, {finalScripts.length} scripts, {ideas.length} ideas.</div>
               <button style={{ ...S.gold, marginTop:16, fontSize:15, padding:"12px 32px" }} disabled={busy} onClick={buildExcel}>
                 {busy ? "Franky is building your file…" : "Download Gem-Crew-Master-Log.xlsx"}
@@ -2643,14 +2643,14 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
             </>
           ) : (
             <>
-              <div style={{ color:"#8B5E0A", fontWeight:700, fontSize:15, marginBottom:6 }}>Next export: {nextExportDay} ({daysUntil} day{daysUntil!==1?"s":""} away)</div>
+              <div style={{ color:"#F0D27A", fontWeight:700, fontSize:15, marginBottom:6 }}>Next export: {nextExportDay} ({daysUntil} day{daysUntil!==1?"s":""} away)</div>
               <div style={S.subtle}>Franky exports on Wednesdays and Sundays to keep your Drive clean.</div>
               <button style={{ ...S.ghost, marginTop:16 }} onClick={buildExcel} disabled={busy}>
                 {busy ? "Building…" : "Export anyway"}
               </button>
             </>
           )}
-          {msg && <div style={{ marginTop:14, fontSize:13.5, color:"#1A7A4A", lineHeight:1.6 }}>{msg}</div>}
+          {msg && <div style={{ marginTop:14, fontSize:13.5, color:"#7FD3AE", lineHeight:1.6 }}>{msg}</div>}
         </div>
       </Card>
 
@@ -2673,7 +2673,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
                 <div style={{ height:6, background:panel2, borderRadius:4, overflow:"hidden" }}>
                   <div style={{ height:"100%", width:`${pct}%`, background:color, borderRadius:4, transition:"width 0.3s" }}/>
                 </div>
-                {pct > 80 && <div style={{ fontSize:11.5, color:"#B03060", marginTop:3 }}>Getting full — export now and oldest entries will auto-trim</div>}
+                {pct > 80 && <div style={{ fontSize:11.5, color:"#F2929F", marginTop:3 }}>Getting full — export now and oldest entries will auto-trim</div>}
               </div>
             );
           })}
@@ -2683,7 +2683,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
 
       <Card>
         <Step crew="franky" label="How to replace your file in Google Drive" />
-        <div style={{ marginTop:10, fontSize:13.5, lineHeight:1.9, color:"#1A1A2E" }}>
+        <div style={{ marginTop:10, fontSize:13.5, lineHeight:1.9, color:"#C9D2F0" }}>
           1. Click Download above — saves as <b>Gem-Crew-Master-Log.xlsx</b><br/>
           2. Open <b>drive.google.com</b><br/>
           3. Find your existing <b>Gem-Crew-Master-Log</b> file<br/>
@@ -2739,6 +2739,30 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
   const learned = insights.length ? insights.slice(0,5).map(i=>i.summary).filter(Boolean).join(" | ") : "no video data yet";
   const scriptSamples = finalScripts.slice(0,2).map(s=>`${s.account}: ${s.text?.slice(0,200)}`).join("\n") || "no scripts saved yet";
 
+  // Detect if a message text implies navigating to a tab
+  function detectNavAction(text) {
+    const t = text.toLowerCase();
+    if (/idea.?board|ideas.?tab|ideas.?section|idea.?section|go to ideas|check.?ideas|open.?ideas/.test(t)) return "ideas";
+    if (/studio.?tab|go to studio|content.?studio|open.?studio/.test(t)) return "studio";
+    if (/analytics.?tab|go to analytics|open.?analytics/.test(t)) return "analytics";
+    if (/strategy.?tab|go to strategy|open.?strategy/.test(t)) return "strategy";
+    if (/calendar.?tab|go to calendar|open.?calendar/.test(t)) return "calendar";
+    return null;
+  }
+
+  // When user says "let's go to X" — add a nav button message from the crew
+  function buildNavMessage(targetTab) {
+    const labels = { ideas:"💡 Ideas Board", studio:"✍️ Studio", analytics:"📊 Analytics", strategy:"🗺️ Strategy", calendar:"📅 Calendar" };
+    return {
+      id: Date.now() + Math.random(),
+      from: "luffy",
+      text: `Sure! Tap below to go there now.`,
+      navTarget: targetTab,
+      navLabel: labels[targetTab] || targetTab,
+      ts: new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})
+    };
+  }
+
   async function send() {
     if (!input.trim() || busy) return;
     const userMsg = { id:Date.now(), from:"you", text:input.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
@@ -2746,6 +2770,16 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
     setMessages(history);
     setInput("");
     setBusy(true);
+
+    // Check if user themselves is asking to navigate
+    const userNavTarget = detectNavAction(userMsg.text);
+    if (userNavTarget && setTab) {
+      // Short delay so user sees the message, then navigate
+      const navMsg = buildNavMessage(userNavTarget);
+      setMessages([...history, navMsg]);
+      setBusy(false);
+      return;
+    }
 
     try {
       const speakers = activeCrew === "all"
@@ -2763,15 +2797,34 @@ Your personality: ${m.blurb}
 What Nami knows: ${learned}
 Boss's recent scripts: ${scriptSamples}
 Be yourself — short, punchy, in character. 2-4 sentences max. This is a chat, not an essay.
+If the boss asks to move to the Ideas board, Studio, Analytics, or any other tab — just say "Sure, tap the button below!" and keep it brief. Do NOT say you can't navigate.
 If you have nothing to add to this specific question, stay quiet (return empty string).`;
         const usr = `Chat history:\n${chatHistory}\n\nBoss just said: "${userMsg.text}"\n\nYour response as ${m.name} (or empty string if nothing to add):`;
         const reply = await ask(sys, usr, false, 400);
         if (reply.trim() && reply.trim() !== '""') {
-          const msg = { id:Date.now()+Math.random(), from:k, text:reply.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
+          // Check if this reply implies navigation
+          const replyNavTarget = detectNavAction(reply);
+          const msg = {
+            id: Date.now()+Math.random(),
+            from: k,
+            text: reply.trim(),
+            ts: new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}),
+            ...(replyNavTarget ? { navTarget: replyNavTarget, navLabel: { ideas:"💡 Ideas Board", studio:"✍️ Studio", analytics:"📊 Analytics", strategy:"🗺️ Strategy", calendar:"📅 Calendar" }[replyNavTarget] } : {})
+          };
           newMsgs.push(msg);
           setMessages([...newMsgs]);
         }
       }
+
+      // If the user mentioned ideas/studio in their message, add a nav button at the end
+      const msgNavTarget = detectNavAction(userMsg.text) || (
+        /idea/i.test(userMsg.text) ? "ideas" : null
+      );
+      if (msgNavTarget && !newMsgs.some(m => m.navTarget)) {
+        newMsgs.push(buildNavMessage(msgNavTarget));
+        setMessages([...newMsgs]);
+      }
+
     } catch(e){ setErr(e.message); }
     setBusy(false);
   }
@@ -2825,7 +2878,14 @@ If you have nothing to add to this specific question, stay quiet (return empty s
                   <div style={{ fontSize:13.5, color: isYou?"#FFFFFF":cream, lineHeight:1.55 }}>{msg.text}</div>
                   <div style={{ fontSize:10.5, color: isYou?"#8B6914":mute, marginTop:4, textAlign:"right" }}>{msg.ts}</div>
                   {!isYou && (
-                    <div style={{ marginTop:6, textAlign:"right" }}>
+                    <div style={{ marginTop:6, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center", justifyContent:"flex-end" }}>
+                      {msg.navTarget && setTab && (
+                        <button
+                          style={{ fontSize:12, padding:"5px 12px", borderRadius:8, cursor:"pointer", background:`linear-gradient(135deg,#C8922A,#8B5E0A)`, color:"#FFFFFF", border:"none", fontWeight:700 }}
+                          onClick={()=>setTab(msg.navTarget)}>
+                          → {msg.navLabel || msg.navTarget}
+                        </button>
+                      )}
                       <button
                         style={{ fontSize:11, background:"none", border:"none", cursor:"pointer", color: savedMsgs[msg.id] ? "#7FD3AE" : "#7E8AAC", padding:0 }}
                         onClick={()=>{
@@ -2893,6 +2953,12 @@ If you have nothing to add to this specific question, stay quiet (return empty s
             </button>
           ))}
         </div>
+        <div style={{ marginTop:12, display:"flex", gap:8, flexWrap:"wrap" }}>
+          <div style={{ fontSize:11, color:mute, width:"100%", marginBottom:4 }}>Quick navigate:</div>
+          {[["ideas","💡 Ideas Board"],["studio","✍️ Studio"],["analytics","📊 Analytics"],["strategy","🗺️ Strategy"]].map(([k,l])=>(
+            <button key={k} style={{ ...S.chip, fontSize:12, padding:"6px 12px", borderColor:gold+"66", color:gold }} onClick={()=>setTab(k)}>{l}</button>
+          ))}
+        </div>
       </Card>
     </div>
   );
@@ -2909,7 +2975,7 @@ function Bible({ bible, setBible }) {
       <h2 style={S.h2}>Everything the crew knows</h2>
 
       <Card accent>
-        <div style={{ fontWeight:700, fontSize:14, color:"#1A7A4A", marginBottom:4 }}>✓ Cross-device sync active</div>
+        <div style={{ fontWeight:700, fontSize:14, color:"#7FD3AE", marginBottom:4 }}>✓ Cross-device sync active</div>
         <p style={{ ...S.subtle }}>Your data syncs automatically across laptop and phone via Supabase. Scripts, ideas, video logs — all synced.</p>
       </Card>
 
@@ -2965,8 +3031,8 @@ function Bubble({ d, bossEntry }) {
       <div style={{ marginBottom:14 }}>
         <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:4 }}>
           <span style={{ fontSize:15 }}>👑</span>
-          <span style={{ fontWeight:700, fontSize:12.5, color:"#8B5E0A" }}>You (Boss)</span>
-          <span style={{ color:"#1A1A2E", fontSize:11 }}>jumped in</span>
+          <span style={{ fontWeight:700, fontSize:12.5, color:"#F0D27A" }}>You (Boss)</span>
+          <span style={{ color:"#9B9490", fontSize:11 }}>jumped in</span>
         </div>
         <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #C8922A", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
       </div>
@@ -2977,8 +3043,8 @@ function Bubble({ d, bossEntry }) {
     <div style={{ marginBottom:14 }}>
       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3 }}>
         <span>{m.icon}</span>
-        <span style={{ fontWeight:600, fontSize:13, color:m.gem }}>{m.name} <span style={{ color:"#1A1A2E", fontWeight:400 }}>({m.role})</span></span>
-        {d.round>0 && <span style={{ fontSize:11, color:"#1A1A2E" }}>· R{d.round}</span>}
+        <span style={{ fontWeight:600, fontSize:13, color:m.gem }}>{m.name} <span style={{ color:"#9B9490", fontWeight:400 }}>({m.role})</span></span>
+        {d.round>0 && <span style={{ fontSize:11, color:"#B0AAA5" }}>· R{d.round}</span>}
         <SpeakBtn text={`${m.name} says: ${d.text}`} crewKey={d.k} small />
       </div>
       <div style={{ fontSize:13.5, lineHeight:1.55, color:"#1A1A2E", paddingLeft:24, borderLeft:`2px solid ${m.gem}88`, marginLeft:7 }}>{d.text}</div>
@@ -2988,7 +3054,7 @@ function Bubble({ d, bossEntry }) {
 const Typing = () => <div style={{ display:"flex", gap:5, padding:"4px 24px" }}>{[0,1,2].map(i=><span key={i} style={{ width:6, height:6, borderRadius:"50%", background:gold, animation:`pulse 1.1s ${i*0.18}s infinite` }} />)}</div>;
 const Card = ({ children, accent }) => <div style={{ ...S.card, ...(accent?{ borderColor:gold, boxShadow:`0 0 16px ${gold}22` }:{}) }}>{children}</div>;
 const Eyebrow = ({ children }) => <div style={S.eyebrow}>{children}</div>;
-const Tag = ({ children, gold: isGold }) => <span style={{ ...S.tag, ...(isGold?{ background:"#FFF3E0", color:"#7A4A00", borderColor:"#C8922A" }:{}) }}>{children}</span>;
+const Tag = ({ children, gold: isGold }) => <span style={{ ...S.tag, ...(isGold?{ background:"#2A1E00", color:"#F0D27A", borderColor:"#6B5418" }:{}) }}>{children}</span>;
 const Label = ({ children }) => <div style={S.miniLabel}>{children}</div>;
 const Field = ({ label, children, full }) => <div style={{ gridColumn: full?"1 / -1":"auto" }}><label style={S.fieldLbl}>{label}</label>{children}</div>;
 const Empty = ({ text, action }) => <div style={S.empty}><div style={{ fontSize:28, marginBottom:8 }}>🏴‍☠️</div><div>{text}</div>{action && <div style={{ marginTop:12 }}>{action}</div>}</div>;
@@ -3002,7 +3068,7 @@ function Step({ n, crew, label }) {
 }
 
 /* ---------- styles — WHITE THEME ---------- */
-const navy = "#1A1A2E", panel = "#F8F7F4", panel2 = "#F0EDE8", line = "#E2DDD6", gold = "#C8922A", goldLight = "#A0710E", goldDeep = "#8B5E0A", cream = "#1A1A2E", mute = "#1A1A2E", appBg = "#FAF9F7";
+const navy = "#1A1A2E", panel = "#F8F7F4", panel2 = "#F0EDE8", line = "#E2DDD6", gold = "#C8922A", goldLight = "#A0710E", goldDeep = "#8B5E0A", cream = "#1A1A2E", mute = "#6B6560", appBg = "#FAF9F7";
 const S = {
   app: { minHeight:"100vh", background:"#FAF9F7", color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
   header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFEFCF5", backdropFilter:"blur(16px)", zIndex:10 },
@@ -3036,7 +3102,7 @@ const S = {
   trendReason: { fontSize:12.5, color:mute, marginTop:3, lineHeight:1.5 },
   thread: { marginTop:12, paddingRight:4 },
   verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF5D6)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}18` },
-  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#3A2500" },
+  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#5C3D00" },
   directive: { fontSize:12.5, color:"#7A5C00CC", marginTop:9 },
   yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#1A1A2E", marginBottom:4 },
   subtle: { fontSize:12.5, color:mute, marginBottom:4 },
