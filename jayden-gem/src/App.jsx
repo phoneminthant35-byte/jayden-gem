@@ -95,7 +95,7 @@ Sein Nan Daw (4.8M), ZweHtet Gold & Jewellery, Pyae Gyi (4.7M), 97 Media (2.2M).
 Academy course line: 095060182 / 09443939440. Yangon.
 `;
 
-const HOOK_TYPES = ["Engineering Flaw", "Lifestyle Mismatch", "Comfort Trap", "Price Shock", "VS / Head-to-head", "Ranking", "Personal / Story"];
+const HOOK_TYPES = ["Engineering Flaw", "Lifestyle Mismatch", "Comfort Trap", "Price Shock", "VS / Head-to-head", "Ranking", "Personal / Story", "Mystery", "Celebrity Jewelry", "Write my own"];
 
 // ---------- API ----------
 async function ask(system, user, json = false, maxTokens = 1000) {
@@ -279,25 +279,25 @@ function SpeedControl() {
   const [manual, setManual] = useState("");
   const update = (v) => { const n = Math.min(2.0, Math.max(0.5, v)); setSpeed(n); window._jaydenSpeed = n; };
   return (
-    <div style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
-      <div style={{ fontSize:11, color:"#D4AF37", fontWeight:700, letterSpacing:1.5, marginBottom:8, textTransform:"uppercase" }}>🔊 Voice speed — {speed.toFixed(2)}x</div>
+    <div style={{ background:"#FFF9F0", border:"1px solid #E8DDD0", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
+      <div style={{ fontSize:11, color:"#C8922A", fontWeight:700, letterSpacing:1.5, marginBottom:8, textTransform:"uppercase" }}>🔊 Voice speed — {speed.toFixed(2)}x</div>
       <input type="range" min="0.5" max="2.0" step="0.05" value={speed}
-        style={{ width:"100%", accentColor:"#D4AF37", marginBottom:8, display:"block" }}
+        style={{ width:"100%", accentColor:"#C8922A", marginBottom:8, display:"block" }}
         onChange={e=>update(parseFloat(e.target.value))}
       />
       <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
         {[0.75, 1.0, 1.25, 1.5, 2.0].map(s=>(
           <button key={s} onClick={()=>update(s)}
             style={{ fontSize:11, padding:"5px 8px", borderRadius:6, cursor:"pointer",
-              background: Math.abs(speed-s)<0.03 ? "linear-gradient(135deg,#D4AF37,#C8922A)" : "transparent",
-              color: Math.abs(speed-s)<0.03 ? "#0A0E1F" : "#9298BC",
-              border:`1px solid ${Math.abs(speed-s)<0.03 ? "#C8922A" : "#2A335C"}`,
+              background: Math.abs(speed-s)<0.03 ? "linear-gradient(135deg,#C8922A,#8B5E0A)" : "transparent",
+              color: Math.abs(speed-s)<0.03 ? "#FFFFFF" : "#6B6560",
+              border:`1px solid ${Math.abs(speed-s)<0.03 ? "#8B5E0A" : "#D0CBC4"}`,
               fontWeight: Math.abs(speed-s)<0.03 ? 700 : 400 }}>
             {s}x
           </button>
         ))}
         <div style={{ display:"flex", alignItems:"center", gap:5, marginLeft:"auto" }}>
-          <span style={{ fontSize:11, color:"#6B7280" }}>Custom:</span>
+          <span style={{ fontSize:11, color:"#6B6560" }}>Custom:</span>
           <input
             type="number" min="0.5" max="2.0" step="0.05"
             placeholder="1.3"
@@ -305,7 +305,7 @@ function SpeedControl() {
             onChange={e=>setManual(e.target.value)}
             onKeyDown={e=>{ if(e.key==="Enter"){ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}}
             onBlur={()=>{ const n=parseFloat(manual); if(!isNaN(n)){ update(n); setManual(""); }}}
-            style={{ background:"#F0F2F8", border:"1px solid #E2E5EF", borderRadius:9, color:"#1A1A2E", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
+            style={{ background:"#FFFFFF", border:"1px solid #D0CBC4", borderRadius:9, color:"#1A1A2E", fontSize:12, padding:"5px 8px", width:70, outline:"none" }}
           />
         </div>
       </div>
@@ -326,7 +326,14 @@ function getSizeKB(value) {
 }
 
 async function loadKey(key, fallback) {
-  // Always try Supabase first — it's the source of truth across devices
+  // ALWAYS check localStorage first — it's the fastest and most reliable local cache
+  let localVal = null;
+  try {
+    const v = localStorage.getItem(key);
+    if (v != null) localVal = JSON.parse(v);
+  } catch(e) {}
+
+  // Try Supabase — it's the cross-device source of truth
   try {
     const r = await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -335,22 +342,54 @@ async function loadKey(key, fallback) {
     if (r.ok) {
       const d = await r.json();
       if (d.value != null) {
-        // Also update localStorage as cache
-        try { localStorage.setItem(key, JSON.stringify(d.value)); } catch(e) {}
-        return d.value;
+        // Supabase has data — use it and update localStorage cache
+        const sbVal = d.value;
+        // If Supabase has LESS data than localStorage, keep localStorage (safer)
+        const sbCount = Array.isArray(sbVal) ? sbVal.length : (sbVal ? 1 : 0);
+        const localCount = Array.isArray(localVal) ? localVal.length : (localVal ? 1 : 0);
+        if (sbCount >= localCount) {
+          try { localStorage.setItem(key, JSON.stringify(sbVal)); } catch(e) {}
+          return sbVal;
+        } else {
+          // localStorage has more data — push it back up to Supabase silently
+          fetch("/api/crew", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "db_set", dataKey: key, value: localVal, updated_at: new Date().toISOString() })
+          }).catch(() => {});
+          return localVal;
+        }
       }
+      // Supabase returned null/empty — use localStorage if available
+      if (localVal != null) return localVal;
     }
   } catch(e) {}
-  // Fall back to localStorage if Supabase unreachable
-  try { const v = localStorage.getItem(key); return v != null ? JSON.parse(v) : fallback; }
-  catch(e) { return fallback; }
+
+  // Both failed — use localStorage if we have it, otherwise fallback
+  return localVal != null ? localVal : fallback;
 }
 
 async function saveKey(key, value) {
   const trimmed = trimData(key, value);
-  // Save to localStorage immediately as backup
+  // SAFETY: never overwrite existing data with empty arrays
+  const isEmpty = Array.isArray(trimmed) ? trimmed.length === 0 : trimmed == null;
+  if (isEmpty) {
+    // Check if there's existing data before allowing the empty save
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) {
+        const parsed = JSON.parse(existing);
+        const hasData = Array.isArray(parsed) ? parsed.length > 0 : parsed != null;
+        if (hasData) {
+          // Don't overwrite real data with empty — this is likely a bug/race condition
+          console.warn("saveKey blocked empty overwrite for", key);
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+  // Save to localStorage immediately
   try { localStorage.setItem(key, JSON.stringify(trimmed)); } catch(e) {}
-  // Always await Supabase save — this is the permanent storage
+  // Save to Supabase
   try {
     await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -385,7 +424,8 @@ export default function App() {
   const [studioPendingTopic, setStudioPendingTopic] = useState(null);
   const [err, setErr] = useState(null);
   const [hydrated, setHydrated] = useState(false);
-  const [syncStatus, setSyncStatus] = useState("connecting"); // "connected" | "offline" | "connecting"
+  const [syncStatus, setSyncStatus] = useState("connecting");
+  const [dataRecovered, setDataRecovered] = useState(false);
 
   // Storage health — warn when approaching auto-trim limits
   const storageWarning = hydrated && (
@@ -404,29 +444,97 @@ export default function App() {
         setSyncStatus(test.ok ? "connected" : "offline");
       } catch(e) { setSyncStatus("offline"); }
 
-      setBible(await loadKey("jg_bible", DEFAULT_BIBLE));
-      setInsights(await loadKey("jg_insights", []));
-      setVideoLog(await loadKey("jg_videoLog", []));
-      setIdeas(await loadKey("jg_ideas", []));
-      setFinalScripts(await loadKey("jg_finalScripts", []));
-      setPageInsights(await loadKey("jg_pageInsights", []));
-      setCalMonth(await loadKey("jg_calMonth", null));
-      setCalWeek(await loadKey("jg_calWeek", null));
-      setPendingLogs(await loadKey("jg_pendingLogs", []));
+      const loadedBible = await loadKey("jg_bible", DEFAULT_BIBLE);
+      const loadedInsights = await loadKey("jg_insights", []);
+      const loadedVideoLog = await loadKey("jg_videoLog", []);
+      const loadedIdeas = await loadKey("jg_ideas", []);
+      const loadedScripts = await loadKey("jg_finalScripts", []);
+      const loadedPageInsights = await loadKey("jg_pageInsights", []);
+      const loadedCalMonth = await loadKey("jg_calMonth", null);
+      const loadedCalWeek = await loadKey("jg_calWeek", null);
+      const loadedPending = await loadKey("jg_pendingLogs", []);
+
+      // If everything loaded empty, check autobackup and restore silently
+      const totalLoaded = loadedVideoLog.length + loadedIdeas.length + loadedScripts.length + loadedInsights.length;
+      if (totalLoaded === 0) {
+        try {
+          const raw = localStorage.getItem("jg_autobackup");
+          if (raw) {
+            const backup = JSON.parse(raw);
+            const backupTotal = (backup.videoLog?.length||0) + (backup.ideas?.length||0) + (backup.finalScripts?.length||0);
+            if (backupTotal > 0) {
+              // Auto-restore from backup silently
+              if (backup.videoLog?.length) { setVideoLog(backup.videoLog); saveKey("jg_videoLog", backup.videoLog); }
+              if (backup.ideas?.length) { setIdeas(backup.ideas); saveKey("jg_ideas", backup.ideas); }
+              if (backup.finalScripts?.length) { setFinalScripts(backup.finalScripts); saveKey("jg_finalScripts", backup.finalScripts); }
+              if (backup.insights?.length) { setInsights(backup.insights); saveKey("jg_insights", backup.insights); }
+              if (backup.pageInsights?.length) { setPageInsights(backup.pageInsights); saveKey("jg_pageInsights", backup.pageInsights); }
+              if (backup.bible) { setBible(backup.bible); saveKey("jg_bible", backup.bible); }
+              if (backup.calMonth) { setCalMonth(backup.calMonth); saveKey("jg_calMonth", backup.calMonth); }
+              if (backup.calWeek) { setCalWeek(backup.calWeek); saveKey("jg_calWeek", backup.calWeek); }
+              setDataRecovered(true);
+              setHydrated(true);
+              return;
+            }
+          }
+        } catch(e) {}
+      }
+
+      setBible(loadedBible);
+      setInsights(loadedInsights);
+      setVideoLog(loadedVideoLog);
+      setIdeas(loadedIdeas);
+      setFinalScripts(loadedScripts);
+      setPageInsights(loadedPageInsights);
+      setCalMonth(loadedCalMonth);
+      setCalWeek(loadedCalWeek);
+      setPendingLogs(loadedPending);
       setHydrated(true);
     })();
   }, []);
 
   // Save whenever data changes (only after first load, so we never wipe stored data)
+  // Extra guard: never save empty arrays — that's always a bug, never intentional data
   useEffect(() => { if (hydrated) saveKey("jg_bible", bible); }, [bible, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_insights", insights); }, [insights, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_videoLog", videoLog); }, [videoLog, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_ideas", ideas); }, [ideas, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_finalScripts", finalScripts); }, [finalScripts, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_pageInsights", pageInsights); }, [pageInsights, hydrated]);
+  useEffect(() => { if (hydrated && insights.length > 0) saveKey("jg_insights", insights); }, [insights, hydrated]);
+  useEffect(() => { if (hydrated && videoLog.length > 0) saveKey("jg_videoLog", videoLog); }, [videoLog, hydrated]);
+  useEffect(() => { if (hydrated && ideas.length > 0) saveKey("jg_ideas", ideas); }, [ideas, hydrated]);
+  useEffect(() => { if (hydrated && finalScripts.length > 0) saveKey("jg_finalScripts", finalScripts); }, [finalScripts, hydrated]);
+  useEffect(() => { if (hydrated && pageInsights.length > 0) saveKey("jg_pageInsights", pageInsights); }, [pageInsights, hydrated]);
   useEffect(() => { if (hydrated && calMonth) saveKey("jg_calMonth", calMonth); }, [calMonth, hydrated]);
   useEffect(() => { if (hydrated && calWeek) saveKey("jg_calWeek", calWeek); }, [calWeek, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
+  useEffect(() => { if (hydrated && pendingLogs.length > 0) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
+
+  // Auto-push to Google Sheets whenever key data changes (debounced 3s so it doesn't fire on every keystroke)
+  const sheetsTimerRef = useRef(null);
+  useEffect(() => {
+    if (!hydrated) return;
+    const webhookUrl = (() => { try { return localStorage.getItem("jg_sheets_webhook") || ""; } catch(e) { return ""; } })();
+    if (!webhookUrl) return;
+    clearTimeout(sheetsTimerRef.current);
+    sheetsTimerRef.current = setTimeout(() => {
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoLog, pageInsights, finalScripts, ideas, exportedAt: new Date().toISOString() })
+      }).catch(() => {}); // silent fail — don't bother the user
+    }, 3000);
+    return () => clearTimeout(sheetsTimerRef.current);
+  }, [videoLog, ideas, finalScripts, pageInsights, hydrated]);
+
+  // Auto-backup: every time app loads with real data, silently snapshot to localStorage
+  // This survives app updates — always a local copy even if Supabase fails
+  useEffect(() => {
+    if (!hydrated) return;
+    const hasData = videoLog.length > 0 || ideas.length > 0 || finalScripts.length > 0 || insights.length > 0;
+    if (!hasData) return;
+    const snapshot = {
+      exportedAt: new Date().toISOString(),
+      version: 2,
+      videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek
+    };
+    try { localStorage.setItem("jg_autobackup", JSON.stringify(snapshot)); } catch(e) {}
+  }, [hydrated]);
 
   return (
     <div style={S.app}>
@@ -436,8 +544,14 @@ export default function App() {
         <div className="wave"/>
         <div className="wave wave2"/>
       </div>
-      <Header tab={tab} setTab={setTab} />
+      <Header tab={tab} setTab={setTab} syncStatus={syncStatus} />
       {err && <div style={S.err}>⚠️ <b>Something went wrong:</b> {err} <button style={S.linkBtn} onClick={() => setErr(null)}>dismiss</button></div>}
+      {dataRecovered && (
+        <div style={{ maxWidth:800, margin:"10px auto 0", background:"#0A1A0A", color:"#7FD3AE", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #206040", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span>✅ <b>Data recovered automatically</b> — your videos, ideas and scripts were restored from local backup. Everything is safe.</span>
+          <button style={{ ...S.linkBtn, color:"#7FD3AE" }} onClick={() => setDataRecovered(false)}>dismiss</button>
+        </div>
+      )}
       {storageWarning && (
         <div style={{ maxWidth:800, margin:"10px auto 0", background:"#1A1400", color:"#F0D27A", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #6B541888", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <span>🔧 <b>Franky says:</b> Storage getting full — run your weekly export and old entries will auto-trim to stay healthy.</span>
@@ -465,7 +579,7 @@ export default function App() {
         {tab === "analytics" && <Analytics videoLog={videoLog} setVideoLog={setVideoLog} insights={insights} setInsights={setInsights} bible={bible} finalScripts={finalScripts} pendingLogs={pendingLogs} setPendingLogs={setPendingLogs} setErr={setErr} />}
         {tab === "insights" && <PageInsights pageInsights={pageInsights} setPageInsights={setPageInsights} bible={bible} setErr={setErr} />}
         {tab === "scripts" && <Scripts finalScripts={finalScripts} setFinalScripts={setFinalScripts} />}
-        {tab === "franky" && <FrankyExport videoLog={videoLog} finalScripts={finalScripts} ideas={ideas} bible={bible} pageInsights={pageInsights} />}
+        {tab === "franky" && <FrankyExport videoLog={videoLog} finalScripts={finalScripts} ideas={ideas} bible={bible} pageInsights={pageInsights} setVideoLog={setVideoLog} setFinalScripts={setFinalScripts} setIdeas={setIdeas} setBible={setBible} setPageInsights={setPageInsights} setInsights={setInsights} setCalMonth={setCalMonth} setCalWeek={setCalWeek} />}
         {tab === "bible" && <Bible bible={bible} setBible={setBible} />}
       </div>
     </div>
@@ -508,7 +622,7 @@ function JollyRoger({ size = 38 }) {
 }
 
 // ---------- Header / Nav ----------
-function Header({ tab, setTab }) {
+function Header({ tab, setTab, syncStatus }) {
   const tabs = [
     ["crew","⚓ Crew"],
     ["strategy","🗺️ Strategy"],
@@ -891,12 +1005,12 @@ function Strategy({ bible, insights, videoLog, setErr }) {
               <div style={{ flex:1 }}>
                 <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap", marginBottom:4 }}>
                   <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream }}>{st.type}</div>
-                  <span style={{ fontSize:10.5, background:"#1A2035", color:gold, border:"1px solid #D4AF3744", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>{st.trigger}</span>
+                  <span style={{ fontSize:10.5, background:"#FFF3E0", color:gold, border:"1px solid #C8922A44", borderRadius:5, padding:"2px 8px", fontWeight:700 }}>{st.trigger}</span>
                 </div>
                 <div style={{ fontSize:13.5, color:"#C9D2F0", lineHeight:1.6, marginBottom:8 }}>{st.desc}</div>
                 <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                   {st.examples.map(e => (
-                    <span key={e} style={{ fontSize:12, background:panel2, color:"#9DBCE0", border:`1px solid ${line}`, borderRadius:8, padding:"4px 10px", fontStyle:"italic" }}>"{e}"</span>
+                    <span key={e} style={{ fontSize:12, background:panel2, color:"#4A6FA5", border:`1px solid ${line}`, borderRadius:8, padding:"4px 10px", fontStyle:"italic" }}>"{e}"</span>
                   ))}
                 </div>
               </div>
@@ -1463,7 +1577,7 @@ function Calendar({ bible, insights, calMonth, setCalMonth, calWeek, setCalWeek,
 // ===================== IDEAS =====================
 function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
   const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busyId, setBusyId] = useState(null); // tracks which specific idea is being debated/discussed
   const [activeIdea, setActiveIdea] = useState(null);
   const [sentToStudio, setSentToStudio] = useState({}); // tracks which ideas were sent to Studio
 
@@ -1481,26 +1595,26 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
 
   async function debateNow(id) {
     const idea = ideas.find(x=>x.id===id); if (!idea) return;
-    setErr(null); setBusy(true);
+    setErr(null); setBusyId(id);
     try {
-      const sys = ctx(bible) + "\nThe crew (Robin, Nami, Usopp) reacts to the boss idea, then Luffy turns it into a plan. Be specific.";
+      const sys = ctx(bible) + "\nThe crew (Robin, Nami, Usopp) reacts to the boss idea, then Luffy turns it into a plan. Be specific. CRITICAL: Respond in natural conversational language. Do NOT use One Piece or anime references.";
       const usr = `Boss idea: "${idea.text}".\nReturn ONLY JSON: {"reactions":[{"who":"Nico Robin","text":""},{"who":"Nami","text":""},{"who":"Usopp","text":""}],"verdict":"Luffy call","bestAccount":"","hook":"","action":"one next step"}.`;
       const plan = await ask(sys, usr, true);
       setIdeas(ideas.map(x=>x.id===id?{ ...x, plan }:x));
     } catch(e){ setErr(e.message); }
-    setBusy(false);
+    setBusyId(null);
   }
 
   async function discussIdea(idea, note) {
     if (!note.trim()) return;
-    setBusy(true);
+    setBusyId(idea.id);
     try {
       const sys = ctx(bible) + "\nYou are Luffy + the crew discussing a saved idea with the boss. Be specific and direct. 3-4 sentences max.";
       const usr = `Idea: "${idea.text}"\nBoss says: "${note}"\nRespond directly to the boss's note about this idea.`;
       const reply = await ask(sys, usr, false, 600);
       setActiveIdea(prev => ({ ...prev, reply, note:"" }));
     } catch(e){ setErr(e.message); }
-    setBusy(false);
+    setBusyId(null);
   }
 
   function saveToScripts(idea) {
@@ -1535,10 +1649,10 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                 </button>
                 {!idea.plan && (
                   <button style={{ ...S.ghost, fontSize:12, padding:"6px 12px",
-                    color: busy ? mute : cream,
-                    borderColor: busy ? line : undefined }}
-                    disabled={busy} onClick={()=>debateNow(idea.id)}>
-                    {busy ? "Debating…" : "⚔️ Quick debate"}
+                    color: busyId===idea.id ? mute : cream,
+                    borderColor: busyId===idea.id ? line : undefined }}
+                    disabled={busyId===idea.id} onClick={()=>debateNow(idea.id)}>
+                    {busyId===idea.id ? "Debating…" : "⚔️ Quick debate"}
                   </button>
                 )}
                 {idea.plan && (
@@ -1570,9 +1684,9 @@ function Ideas({ ideas, setIdeas, bible, setStudioSeed, setTab, setErr }) {
                   placeholder='e.g. "Which account should this go on?" or "What hook should I use?"'
                   value={activeIdea.note||""}
                   onChange={e=>setActiveIdea(prev=>({...prev, note:e.target.value}))} />
-                <button style={{ ...S.gold, marginTop:6, fontSize:12 }} disabled={busy}
+                <button style={{ ...S.gold, marginTop:6, fontSize:12 }} disabled={busyId===idea.id}
                   onClick={()=>discussIdea(idea, activeIdea.note||"")}>
-                  {busy?"…":"Send to crew"}
+                  {busyId===idea.id?"…":"Send to crew"}
                 </button>
               </div>
             )}
@@ -1840,12 +1954,12 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
           <div style={{ background:"#0A1A0A", border:"1px solid #206040", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
             <div>
               <div style={{ fontSize:11, color:"#7FD3AE", fontWeight:700, letterSpacing:1, marginBottom:2 }}>✓ LAST LOGGED</div>
-              <div style={{ fontSize:13.5, color:cream, fontWeight:600 }}>{last.title || "(untitled)"}</div>
-              <div style={{ fontSize:12, color:mute, marginTop:2 }}>{last.account} · {last.views ? Number(last.views).toLocaleString()+" views" : ""} · {loggedAt}</div>
+              <div style={{ fontSize:13.5, color:"#F0EDE6", fontWeight:600 }}>{last.title || "(untitled)"}</div>
+              <div style={{ fontSize:12, color:"#9BA8C4", marginTop:2 }}>{last.account} · {last.views ? Number(last.views).toLocaleString()+" views" : ""} · {loggedAt}</div>
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:22, fontWeight:700, color: last.ai?.score>=70?"#7FD3AE":last.ai?.score>=45?"#F0D27A":"#F2929F" }}>{last.ai?.score}</div>
-              <div style={{ fontSize:10, color:mute }}>SCORE</div>
+              <div style={{ fontSize:10, color:"#9BA8C4" }}>SCORE</div>
             </div>
           </div>
         );
@@ -1941,7 +2055,15 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
           <Field label="Shares"><input style={S.input} type="number" value={f.shares} onChange={e=>set("shares",e.target.value)} /></Field>
           <Field label="Saves"><input style={S.input} type="number" value={f.saves} onChange={e=>set("saves",e.target.value)} /></Field>
           <Field label="Celebrity"><input style={S.input} value={f.celebrity} onChange={e=>set("celebrity",e.target.value)} /></Field>
-          <Field label="Hook type"><select style={S.input} value={f.hookType} onChange={e=>set("hookType",e.target.value)}>{HOOK_TYPES.map(h=><option key={h}>{h}</option>)}</select></Field>
+          <Field label="Hook type">
+            <select style={S.input} value={f.hookType} onChange={e=>set("hookType",e.target.value)}>
+              {HOOK_TYPES.map(h=><option key={h}>{h}</option>)}
+            </select>
+            {f.hookType === "Write my own" && (
+              <input style={{ ...S.input, marginTop:6 }} placeholder="Describe your hook style…"
+                value={f.customHook||""} onChange={e=>set("customHook",e.target.value)} />
+            )}
+          </Field>
           <Field label="Date posted"><input style={S.input} type="date" value={f.date} onChange={e=>set("date",e.target.value)} /></Field>
           <Field label="Days since posted"><input style={S.input} type="number" min="1" placeholder="e.g. 1" value={f.daysOld} onChange={e=>set("daysOld",e.target.value)} /></Field>
         </div>
@@ -2154,8 +2276,14 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
             <div style={{ color:CREW.robin.facet }}><b>Brief → Nico Robin:</b> {v.ai.toRobin}</div>
             <div style={{ color:CREW.usopp.facet, marginTop:4 }}><b>Brief → Usopp:</b> {v.ai.toUsopp}</div>
           </div>
-          <div style={{ marginTop:10 }}>
+          <div style={{ marginTop:10, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
             <button style={S.ghost} onClick={()=>editEntry(v)}>Update stats (numbers changed)</button>
+            <button style={S.linkBtn} onClick={()=>{
+              if (!window.confirm("Delete \"" + v.title + "\"? This can't be undone.")) return;
+              const idx = videoLog.findIndex(x => x.id === v.id);
+              setVideoLog(prev => prev.filter(x => x.id !== v.id));
+              if (idx !== -1) setInsights(prev => prev.filter((_, i) => i !== idx));
+            }}>Delete</button>
           </div>
         </Card>
       ))}
@@ -2478,13 +2606,63 @@ function Scripts({ finalScripts, setFinalScripts }) {
 }
 
 // ===================== FRANKY EXPORT =====================
-function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] }) {
+function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [], setVideoLog, setFinalScripts, setIdeas, setBible, setPageInsights, setInsights, setCalMonth, setCalWeek }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [restoreMsg, setRestoreMsg] = useState(null);
   const [webhookUrl, setWebhookUrl] = useState(() => {
     try { return localStorage.getItem("jg_sheets_webhook") || ""; } catch(e) { return ""; }
   });
   const [webhookInput, setWebhookInput] = useState("");
+
+  // Check for auto-backup in localStorage
+  const autoBackup = (() => {
+    try {
+      const raw = localStorage.getItem("jg_autobackup");
+      if (!raw) return null;
+      const b = JSON.parse(raw);
+      return b;
+    } catch(e) { return null; }
+  })();
+
+  function downloadBackup() {
+    const snapshot = {
+      exportedAt: new Date().toISOString(),
+      version: 2,
+      videoLog, ideas, finalScripts, insights: [], pageInsights, bible
+    };
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `jayden-gem-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setMsg("✓ Backup downloaded! Save this file somewhere safe (Google Drive, phone, email it to yourself).");
+  }
+
+  function restoreFromFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.version) throw new Error("Not a valid Jayden Gem backup file");
+        let restored = 0;
+        if (Array.isArray(data.videoLog) && data.videoLog.length > 0) { setVideoLog(data.videoLog); saveKey("jg_videoLog", data.videoLog); restored += data.videoLog.length; }
+        if (Array.isArray(data.ideas) && data.ideas.length > 0) { setIdeas(data.ideas); saveKey("jg_ideas", data.ideas); restored += data.ideas.length; }
+        if (Array.isArray(data.finalScripts) && data.finalScripts.length > 0) { setFinalScripts(data.finalScripts); saveKey("jg_finalScripts", data.finalScripts); restored += data.finalScripts.length; }
+        if (Array.isArray(data.pageInsights) && data.pageInsights.length > 0) { setPageInsights(data.pageInsights); saveKey("jg_pageInsights", data.pageInsights); }
+        if (Array.isArray(data.insights) && data.insights.length > 0) { setInsights(data.insights); saveKey("jg_insights", data.insights); }
+        if (data.bible && typeof data.bible === "string") { setBible(data.bible); saveKey("jg_bible", data.bible); }
+        if (data.calMonth) { setCalMonth(data.calMonth); saveKey("jg_calMonth", data.calMonth); }
+        if (data.calWeek) { setCalWeek(data.calWeek); saveKey("jg_calWeek", data.calWeek); }
+        setRestoreMsg(`✓ Restored ${restored} entries from backup (${data.exportedAt?.slice(0,10) || "unknown date"}). Check your tabs — everything should be back.`);
+      } catch(err) {
+        setRestoreMsg("✗ Could not read that file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
 
   const today = new Date();
   const day = today.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
@@ -2561,6 +2739,46 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
       <h2 style={S.h2}>🔧 Franky updates your master log</h2>
       <p style={S.lede}>Franky packages everything — video log, page insights, scripts, ideas, and Brand Bible — into one Excel file. Set up the Google Sheets webhook once and Franky pushes everything there automatically.</p>
 
+      {/* ── BACKUP & RESTORE — always at the top ── */}
+      <Card accent>
+        <div style={{ fontWeight:700, fontSize:15, color:"#1A1A2E", marginBottom:4 }}>🛡️ Backup & Restore</div>
+        <p style={{ ...S.subtle, marginBottom:12 }}>Download a JSON backup of ALL your data. If anything ever goes wrong after an update, drag the file back in to restore everything instantly.</p>
+
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:12 }}>
+          <button style={S.gold} onClick={downloadBackup}>
+            ⬇️ Download backup now
+          </button>
+          <div style={{ fontSize:12, color:mute, alignSelf:"center" }}>
+            {videoLog.length} videos · {ideas.length} ideas · {finalScripts.length} scripts
+          </div>
+        </div>
+
+        {/* Auto-backup status */}
+        {autoBackup && (
+          <div style={{ fontSize:12, color:"#2D8A5E", marginBottom:10, background:"#F0FFF8", borderRadius:7, padding:"6px 10px", border:"1px solid #A5D6A7" }}>
+            ✓ Auto-backup saved locally — {autoBackup.exportedAt?.slice(0,10)} · {autoBackup.videoLog?.length||0} videos · {autoBackup.ideas?.length||0} ideas
+          </div>
+        )}
+
+        {/* Restore from file */}
+        <div style={{ borderTop:`1px solid #E2DDD6`, paddingTop:12, marginTop:4 }}>
+          <div style={{ fontSize:12.5, fontWeight:700, color:"#1A1A2E", marginBottom:6 }}>↩️ Restore from backup file</div>
+          <div style={{ fontSize:12, color:mute, marginBottom:8 }}>Drag your .json backup file here, or click to pick it.</div>
+          <input type="file" accept=".json,application/json"
+            style={{ fontSize:12.5, color:"#1A1A2E" }}
+            onChange={e => restoreFromFile(e.target.files?.[0])} />
+          {restoreMsg && (
+            <div style={{ marginTop:8, fontSize:13, color: restoreMsg.startsWith("✓") ? "#2D8A5E" : "#C0392B",
+              background: restoreMsg.startsWith("✓") ? "#F0FFF8" : "#FFF0F0",
+              borderRadius:8, padding:"8px 12px", border:`1px solid ${restoreMsg.startsWith("✓") ? "#A5D6A7" : "#F5C6CB"}` }}>
+              {restoreMsg}
+            </div>
+          )}
+        </div>
+
+        {msg && <div style={{ marginTop:8, fontSize:13, color:"#2D8A5E" }}>{msg}</div>}
+      </Card>
+
       {/* Google Sheets auto-push setup */}
       <Card accent>
         <div style={{ fontWeight:700, fontSize:14, color:cream, marginBottom:4 }}>
@@ -2621,7 +2839,7 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
           </div>
         ) : (
           <div>
-            <div style={{ fontSize:13, color:"#7FD3AE", marginBottom:8 }}>✓ Every time Franky exports, your Google Sheet updates automatically.</div>
+            <div style={{ fontSize:13, color:"#2D8A5E", marginBottom:8 }}>✓ Auto-push active — every time you log a video, save an idea, or add a script, Franky pushes to Google Sheets automatically (within 3 seconds).</div>
             <button style={{ ...S.ghost, fontSize:12 }} onClick={()=>{ 
               try { localStorage.removeItem("jg_sheets_webhook"); } catch(e) {}
               setWebhookUrl(""); 
@@ -2699,12 +2917,11 @@ function FrankyExport({ videoLog, finalScripts, ideas, bible, pageInsights = [] 
 
 // ===================== CREW CHAT =====================
 function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, setErr }) {
-  const WELCOME = { id:0, from:"luffy", text:"Oi! The whole crew is here. What do you want to talk about? Ask anything — strategy, scripts, what to post, what's working, anything.", ts: new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}), savedAt: Date.now() };
+  const WELCOME = { id:0, from:"luffy", text:"Yo! Whole crew is here — Robin, Nami, Usopp, Franky and me. Talk to us like real people. Give us a task, ask for opinions, argue with us. We actually listen to each other in here.", ts: new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}), savedAt: Date.now() };
 
   const [messages, setMessages] = useState([WELCOME]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [activeCrew, setActiveCrew] = useState("all");
   const [savedMsgs, setSavedMsgs] = useState({});
   const bottomRef = useRef(null);
 
@@ -2715,121 +2932,151 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
         const saved = await loadKey("jg_chatMessages", null);
         if (saved && Array.isArray(saved) && saved.length > 0) {
           const age = Date.now() - (saved[saved.length-1]?.savedAt || 0);
-          const oneDayMs = 24 * 60 * 60 * 1000;
-          if (age < oneDayMs) {
-            setMessages(saved);
-            return;
-          }
+          if (age < 24 * 60 * 60 * 1000) { setMessages(saved); return; }
         }
       } catch(e) {}
       setMessages([WELCOME]);
     })();
   }, []);
 
-  // Save messages whenever they change
   useEffect(() => {
     if (messages.length > 1) {
-      const toSave = messages.slice(-50).map(m => ({ ...m, savedAt: Date.now() }));
+      const toSave = messages.slice(-60).map(m => ({ ...m, savedAt: Date.now() }));
       saveKey("jg_chatMessages", toSave);
     }
   }, [messages]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
 
-  const learned = insights.length ? insights.slice(0,5).map(i=>i.summary).filter(Boolean).join(" | ") : "no video data yet";
-  const scriptSamples = finalScripts.slice(0,2).map(s=>`${s.account}: ${s.text?.slice(0,200)}`).join("\n") || "no scripts saved yet";
+  const learned = insights.length ? insights.slice(0,8).map(i=>i.summary).filter(Boolean).join(" | ") : "no video data yet";
+  const topVideos = videoLog.slice(0,5).map(v => `${v.title}: ${v.views} views, score ${v.ai?.score}, ${v.ai?.viral} viral`).join(" | ") || "none logged";
+  const scriptSamples = finalScripts.slice(0,3).map(s=>`[${s.account}] ${s.text?.slice(0,150)}`).join("\n") || "none saved";
+
+  // Full crew personas — each one is a distinct real person with their own brain
+  const PERSONAS = {
+    robin: {
+      name: "Nico Robin", icon: "🔮", gem: "#9B6BD6", facet: "#C9A4F0",
+      brain: `You are Robin. You are the quiet, deeply analytical one. You dig up insights others miss. You read between the lines. You speak carefully and precisely — never fluff. You reference real trends, real data, real cultural patterns. When others are wrong, you correct them calmly with evidence. You hand off tasks to Usopp when you've found the angle that should drive the script. You genuinely care about accuracy over hype.`,
+    },
+    nami: {
+      name: "Nami", icon: "📊", gem: "#3FA37A", facet: "#7FD3AE",
+      brain: `You are Nami. You are sharp, direct, sometimes blunt. You think in numbers and ROI. You push back hard when someone proposes something that won't convert or won't grow the channel. You cite actual stats from the video log when you have them. You disagree with Robin when she goes too deep into theory and loses the practical angle. You delegate logistics and tracking tasks to Franky. You respect Luffy's call but you'll argue your point until he decides.`,
+    },
+    usopp: {
+      name: "Usopp", icon: "✍️", gem: "#E0556B", facet: "#F2929F",
+      brain: `You are Usopp. You are the creative, storytelling-obsessed one. You get genuinely excited about hooks and narrative. You disagree with Nami when she prioritizes numbers over a good story — sometimes a risky creative idea is worth it. When Robin hands you a trend angle, you immediately start thinking about how to open the script. You actually write draft hook lines in chat when asked. You're a bit dramatic but always genuine. You push for the most original, unexpected angle.`,
+    },
+    luffy: {
+      name: "Luffy", icon: "👑", gem: "#D4AF37", facet: "#F0D27A",
+      brain: `You are Luffy. You are the captain. You listen to the whole crew argue, then make a clear decisive call. You don't do long explanations — you give direction. You're the one who breaks deadlocks. When the crew is going in circles, you cut through it. You push everyone to be bolder. You speak directly to specific crew members: "Robin, find that," "Usopp, write that hook now," "Nami, are the numbers there?" You hold the crew accountable. You make the final call and you own it.`,
+    },
+    franky: {
+      name: "Franky", icon: "🔧", gem: "#3E86C4", facet: "#84B8E6",
+      brain: `You are Franky. You are the operational one — systems, records, logistics. You're the one who actually does stuff: writes the log entry, tracks the format, confirms the plan is executable. You're not a big talker but when you speak it's practical and final. You point out when a plan is missing a step. You confirm when tasks are done. You push back when the crew is being unrealistic about what's actually achievable. You talk about what's been logged, what needs logging, what the schedule looks like.`,
+    },
+  };
+
+  function detectNavAction(text) {
+    const t = text.toLowerCase();
+    if (/idea.?board|ideas.?tab|go to ideas|open.?ideas/.test(t)) return "ideas";
+    if (/studio.?tab|go to studio|content.?studio/.test(t)) return "studio";
+    if (/analytics.?tab|go to analytics|open.?analytics/.test(t)) return "analytics";
+    if (/strategy.?tab|go to strategy/.test(t)) return "strategy";
+    if (/calendar.?tab|go to calendar/.test(t)) return "calendar";
+    return null;
+  }
+
+  function buildNavMsg(targetTab) {
+    const labels = { ideas:"💡 Ideas Board", studio:"✍️ Studio", analytics:"📊 Analytics", strategy:"🗺️ Strategy", calendar:"📅 Calendar" };
+    return { id: Date.now()+Math.random(), from:"luffy", text:"Tap below.", navTarget:targetTab, navLabel:labels[targetTab]||targetTab, ts:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) };
+  }
 
   async function send() {
     if (!input.trim() || busy) return;
-    const userMsg = { id:Date.now(), from:"you", text:input.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
+    const userMsg = { id:Date.now(), from:"you", text:input.trim(), ts:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) };
     const history = [...messages, userMsg];
     setMessages(history);
     setInput("");
     setBusy(true);
 
+    const navTarget = detectNavAction(userMsg.text);
+    if (navTarget && setTab) {
+      setMessages([...history, buildNavMsg(navTarget)]);
+      setBusy(false);
+      return;
+    }
+
     try {
-      const chatHistory = history.slice(-10).map(m =>
-        m.from === "you" ? `Boss: ${m.text}` : `${CREW[m.from]?.name || m.from}: ${m.text}`
-      ).join("\n");
+      // Build full conversation context — every crew member sees the whole chat including what their crewmates just said
+      const recentChat = history.slice(-14).map(m => {
+        if (m.from === "you") return `[BOSS Jayden]: ${m.text}`;
+        const p = PERSONAS[m.from];
+        return `[${p?.name || m.from}]: ${m.text}`;
+      }).join("\n");
+
+      // Shared context all crew members get
+      const sharedCtx = ctx(bible) + `
+
+CREW CONTEXT — you are all in a real group chat. This is a real workplace, not a roleplay.
+Jayden is your boss and the owner. You work for him. You have real opinions and real expertise.
+You read EVERY message from your crewmates in this conversation. You respond to them directly — agree, disagree, build on their point, hand off tasks to the right person.
+You do NOT all respond to the boss every time. Sometimes one person speaks, sometimes two, sometimes all. Use judgment.
+You hand off tasks explicitly: "Robin, can you pull that?" / "Usopp that's yours" / "Nami check if the numbers support that."
+
+WHAT JAYDEN'S DATA SHOWS:
+Video performance: ${topVideos}
+Nami's lessons: ${learned}
+Recent scripts (Jayden's voice): ${scriptSamples}
+
+CRITICAL RULES:
+- Read what your crewmates said and REACT to it specifically. Never speak in a vacuum.
+- If someone already said what you were going to say — add to it or disagree, don't repeat.
+- If Luffy gives a directive — follow it. Robin finds, Usopp writes, Nami checks numbers, Franky logs.
+- Actually DO the task if asked. Usopp writes actual hook lines. Robin writes actual trend findings. Nami gives actual numbers analysis.
+- Stay in your lane but push back when it matters. Short, direct, real. No filler.
+- If nothing useful to add — stay silent (return exactly: SILENT).
+- Max 3-4 sentences unless doing a real task (writing, analyzing) — then do the full task.`;
 
       const newMsgs = [...history];
-      const thisRound = []; // what crew said THIS turn so they can react to each other
+      let roundSummary = recentChat; // grows as each crew member speaks this round
 
-      if (activeCrew !== "all") {
-        // Single member mode — just talk to that person
-        const m = CREW[activeCrew];
-        const sys = ctx(bible) + `\nYou are ${m.name} (${m.role}) in a direct conversation with Jayden. ${m.blurb}\nData: ${learned}\nBe direct, specific, in character. 2-4 sentences max.`;
-        const usr = `Chat history:\n${chatHistory}\n\nBoss says: "${userMsg.text}"\n\nYour response as ${m.name}:`;
-        const reply = await ask(sys, usr, false, 500);
-        if (reply.trim() && reply.trim() !== '""') {
-          const msg = { id:Date.now()+Math.random(), from:activeCrew, text:reply.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
+      // Determine who should speak — Luffy always reads last and makes the call if needed
+      const speakerOrder = ["robin", "nami", "usopp", "franky", "luffy"];
+
+      for (const k of speakerOrder) {
+        const p = PERSONAS[k];
+        const sys = sharedCtx + `\n\n--- YOUR IDENTITY ---\n${p.brain}`;
+        const usr = `FULL CONVERSATION SO FAR (including what your crewmates just said this round):\n${roundSummary}\n\nBoss just said: "${userMsg.text}"\n\nYour response as ${p.name}. If nothing to add, return exactly: SILENT`;
+
+        const reply = await ask(sys, usr, false, 600);
+        const clean = reply.trim().replace(/^["']|["']$/g, "");
+
+        if (clean && clean !== "SILENT" && clean.toUpperCase() !== "SILENT" && clean.length > 3) {
+          const msg = {
+            id: Date.now()+Math.random(),
+            from: k,
+            text: clean,
+            ts: new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),
+          };
+          // Check for nav in reply
+          const replyNav = detectNavAction(clean);
+          if (replyNav) { msg.navTarget = replyNav; msg.navLabel = {ideas:"💡 Ideas Board",studio:"✍️ Studio",analytics:"📊 Analytics",strategy:"🗺️ Strategy",calendar:"📅 Calendar"}[replyNav]; }
+
           newMsgs.push(msg);
           setMessages([...newMsgs]);
-        }
-      } else {
-        // ALL CREW mode — Luffy first decides who speaks and what angle, then sequential
-
-        // Step 1: Luffy quietly decides the roster (not shown to user)
-        const directorSys = `You are Luffy, a creative director. The boss asked something. Pick 1-2 of these crew members to respond (not Luffy yet, not Franky): Robin (trends/research/celebrity knowledge), Nami (analytics/data/what numbers say), Usopp (scripts/hooks/content execution). Pick whoever is most relevant. Not everyone needs to speak. Return ONLY JSON: {"speak":[{"member":"robin|nami|usopp","angle":"specific thing to address in 1 sentence"}]}`;
-        const directorUsr = `Boss said: "${userMsg.text}"\nContext: ${chatHistory.slice(-200)}`;
-        let roster = [{ member:"nami", angle:"share your analysis" }];
-        try {
-          const plan = await ask(directorSys, directorUsr, true, 300);
-          if (plan?.speak?.length > 0) roster = plan.speak.slice(0,2);
-        } catch(e) {}
-
-        // Step 2: Each crew member responds, reading what crewmates said before them
-        const PERSONALITIES = {
-          robin: `You are Nico Robin — calm, precise, slightly mysterious. You speak like someone who has read everything and found the pattern nobody else noticed. You never raise your voice. You cite specific examples or data points. You occasionally say something unexpected that turns out to be exactly right. You don't use exclamation marks. If you disagree, you do it quietly but firmly. VOICE EXAMPLE: "Interestingly, the last three videos that crossed 100K all opened with a price reveal in the first 0.8 seconds. The pattern isn't the celebrity — it's the number."`,
-          nami: `You are Nami — blunt, sharp, slightly impatient with bad ideas. You lead with numbers and facts. You will call something out if the data doesn't support it. You're loyal but not soft. You occasionally get sarcastic when something is obviously wrong. Short sentences. You care about results more than feelings. VOICE EXAMPLE: "That's not what the numbers say. Completion rate was 11% — people dropped at the hook. Doesn't matter how good the middle was."`,
-          usopp: `You are Usopp — enthusiastic, creative, sometimes dramatic. You think in hooks, story beats, and emotional punches. You get genuinely excited about a good angle. You push for bolder hooks than anyone else. You sometimes start with "Wait —" or "Okay but what if —". VOICE EXAMPLE: "Wait — what if instead of starting with the price, you open with the SOUND? Like, describe what a 3-carat diamond sounds like hitting marble. Nobody does that. That's the hook."`,
-        };
-
-        for (const { member, angle } of roster) {
-          const m = CREW[member];
-          if (!m) continue;
-          const crewSoFar = thisRound.map(msg => `${CREW[msg.from]?.name}: ${msg.text}`).join("\n");
-          const personality = PERSONALITIES[member] || `You are ${m.name} (${m.role}). ${m.blurb}`;
-          const sys = ctx(bible) + `\n\n${personality}\n\nYou are in a group crew chat. CRITICAL: Read what crewmates already said and BUILD on it — agree, push back, add something new they didn't cover. Never repeat what was already said. Speak to both the boss AND the crew. Stay in your character voice the whole time. 2-3 sentences max.\n\nData: ${learned}`;
-          const usr = `Boss said: "${userMsg.text}"\nHistory:\n${chatHistory}${crewSoFar ? `\n\nCrew said this round:\n${crewSoFar}` : ""}\n\nYour angle: ${angle}\nRespond as ${m.name} in your voice:`;
-          const reply = await ask(sys, usr, false, 400);
-          if (reply.trim() && reply.trim() !== '""') {
-            const msg = { id:Date.now()+Math.random(), from:member, text:reply.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
-            newMsgs.push(msg); thisRound.push(msg);
-            setMessages([...newMsgs]);
-          }
-        }
-
-        // Step 3: Luffy ALWAYS goes last — synthesizes crew, gives clear directive
-        const crewSummary = thisRound.map(msg => `${CREW[msg.from]?.name}: ${msg.text}`).join("\n");
-        const luffySys = ctx(bible) + `\nYou are Luffy — the captain. Simple, direct, decisive. You don't overthink. You go with your gut and your crew's input. You speak in plain language. No corporate talk. You reference crew members by name when you agree or disagree with them. You always end with one clear thing for the boss to DO. You're never wishy-washy. VOICE EXAMPLE: "Robin's right about the pattern. But Nami — 11% completion means we fix the hook first, everything else comes second. Boss: open with the price, not the name. That's the video." 2-3 sentences max.`;
-        const luffyUsr = `Boss said: "${userMsg.text}"\n\nCrew said:\n${crewSummary || "(nobody spoke)"}\n\nFinal call as Luffy — reference the crew, be decisive, end with one action:`;
-        const luffyReply = await ask(luffySys, luffyUsr, false, 400);
-        if (luffyReply.trim() && luffyReply.trim() !== '""') {
-          const msg = { id:Date.now()+Math.random(), from:"luffy", text:luffyReply.trim(), ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) };
-          newMsgs.push(msg);
-          setMessages([...newMsgs]);
+          // Add this reply to the running context so next crew member sees it
+          roundSummary += `\n[${p.name}]: ${clean}`;
         }
       }
 
-      // Nav detection — if any message implies going to a tab, add nav button
-      const allNewText = [...thisRound.map(m=>m.text), userMsg.text].join(" ");
-      const navTarget = detectNavAction(allNewText);
-      if (navTarget && setTab) {
-        const labels = { ideas:"💡 Ideas Board", studio:"✍️ Studio", analytics:"📊 Analytics", strategy:"🗺️ Strategy", calendar:"📅 Calendar" };
-        newMsgs.push({ id:Date.now()+Math.random(), from:"luffy", text:"Tap below to go there.", navTarget, navLabel:labels[navTarget]||navTarget, ts:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) });
-        setMessages([...newMsgs]);
-      }
-
-    } catch(e){ setErr(e.message); }
+    } catch(e) { setErr(e.message); }
     setBusy(false);
   }
-
   return (
     <div>
       <Eyebrow>Crew Chat</Eyebrow>
-      <h2 style={S.h2}>💬 Talk to the whole crew</h2>
-      <p style={S.lede}>Ask anything — strategy, what to post, script feedback, what's working. Chat saves for 24 hours then resets fresh.</p>
+      <h2 style={S.h2}>💬 Your crew — real people, real opinions</h2>
+      <p style={S.lede}>They listen to each other, argue, hand off tasks, and actually do the work. Give them a task or an opinion and watch them run with it.</p>
       <SpeedControl />
       <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:8 }}>
         <button style={{ ...S.linkBtn, color:mute, fontSize:12 }} onClick={()=>{
@@ -2838,48 +3085,52 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
         }}>Clear chat</button>
       </div>
 
-      {/* Who to talk to */}
-      <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:14 }}>
-        <button style={{ ...S.seg, ...(activeCrew==="all"?S.segOn:{}) }} onClick={()=>setActiveCrew("all")}>
-          👥 All crew
-        </button>
-        {Object.entries(CREW).map(([k,m])=>(
-          <button key={k} style={{ ...S.seg, ...(activeCrew===k?{ ...S.segOn, background:m.gem, borderColor:m.gem }:{}) }}
-            onClick={()=>setActiveCrew(k)}>
-            {m.icon} {m.name}
-          </button>
+      {/* Crew roster — visual only, no filter */}
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:14 }}>
+        {Object.entries(PERSONAS).map(([k,p])=>(
+          <div key={k} style={{ display:"flex", alignItems:"center", gap:5, background:"#FFFFFF", border:`1.5px solid ${p.gem}44`, borderRadius:10, padding:"6px 10px" }}>
+            <span style={{ fontSize:15 }}>{p.icon}</span>
+            <span style={{ fontSize:11.5, fontWeight:700, color:p.gem }}>{p.name}</span>
+          </div>
         ))}
       </div>
 
       {/* Chat thread */}
-      <div style={{ background:"#FFFFFF", borderRadius:16, border:`1px solid ${line}`, overflow:"hidden", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ background:"#FFFFFF", borderRadius:16, border:`1px solid #E2DDD6`, overflow:"hidden", marginBottom:12, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" }}>
         <div style={{ maxHeight:480, overflowY:"auto", padding:"16px 14px" }}>
           {messages.map(msg => {
             const isYou = msg.from === "you";
-            const m = isYou ? null : CREW[msg.from];
+            const m = isYou ? null : (PERSONAS[msg.from] || CREW[msg.from]);
             return (
               <div key={msg.id} style={{ display:"flex", gap:10, marginBottom:14, flexDirection: isYou?"row-reverse":"row", alignItems:"flex-end" }}>
                 {!isYou && (
-                  <div style={{ width:32, height:32, borderRadius:"50%", background:m?.gem+"33", border:`1.5px solid ${m?.gem}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>
+                  <div style={{ width:32, height:32, borderRadius:"50%", background:(m?.gem||"#C8922A")+"33", border:`1.5px solid ${m?.gem||"#C8922A"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>
                     {m?.icon}
                   </div>
                 )}
-                <div style={{ maxWidth:"72%", background: isYou ? `linear-gradient(135deg,#D4AF37,#C8922A)` : panel2, borderRadius: isYou?"16px 16px 4px 16px":"16px 16px 16px 4px", padding:"10px 13px", border: isYou?"none":`1px solid ${line}` }}>
+                <div style={{ maxWidth:"72%", background: isYou ? `linear-gradient(135deg,#C8922A,#8B5E0A)` : panel2, borderRadius: isYou?"16px 16px 4px 16px":"16px 16px 16px 4px", padding:"10px 13px", border: isYou?"none":`1px solid ${line}` }}>
                   {!isYou && (
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:4 }}>
-                      <div style={{ fontSize:11, fontWeight:700, color:m?.facet, letterSpacing:0.3 }}>{m?.name}</div>
+                      <div style={{ fontSize:11, fontWeight:700, color:m?.facet||m?.gem, letterSpacing:0.3 }}>{m?.name}</div>
                       <SpeakBtn text={msg.text} crewKey={msg.from} small />
                     </div>
                   )}
                   <div style={{ fontSize:13.5, color: isYou?"#FFFFFF":cream, lineHeight:1.55 }}>{msg.text}</div>
                   <div style={{ fontSize:10.5, color: isYou?"#8B6914":mute, marginTop:4, textAlign:"right" }}>{msg.ts}</div>
                   {!isYou && (
-                    <div style={{ marginTop:6, textAlign:"right" }}>
+                    <div style={{ marginTop:6, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center", justifyContent:"flex-end" }}>
+                      {msg.navTarget && setTab && (
+                        <button
+                          style={{ fontSize:12, padding:"5px 12px", borderRadius:8, cursor:"pointer", background:`linear-gradient(135deg,#C8922A,#8B5E0A)`, color:"#FFFFFF", border:"none", fontWeight:700 }}
+                          onClick={()=>setTab(msg.navTarget)}>
+                          → {msg.navLabel || msg.navTarget}
+                        </button>
+                      )}
                       <button
                         style={{ fontSize:11, background:"none", border:"none", cursor:"pointer", color: savedMsgs[msg.id] ? "#7FD3AE" : "#7E8AAC", padding:0 }}
                         onClick={()=>{
                           if (savedMsgs[msg.id] || !setIdeas) return;
-                          const ideaText = `${m?.name||"Crew"}: ${msg.text.slice(0,200)}${msg.text.length>200?"…":""}`;
+                          const ideaText = `${(PERSONAS[msg.from]||CREW[msg.from])?.name||"Crew"}: ${msg.text.slice(0,200)}${msg.text.length>200?"…":""}`;
                           setIdeas(prev=>[{ id:Date.now(), text:ideaText, plan:null, date:new Date().toISOString().slice(0,10) }, ...prev]);
                           setSavedMsgs(prev=>({...prev,[msg.id]:true}));
                         }}>
@@ -2908,7 +3159,7 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
         </div>
 
         {/* Input bar */}
-        <div style={{ borderTop:`1px solid ${line}`, padding:"10px 12px", display:"flex", gap:8, background:"#F8F9FB" }}>
+        <div style={{ borderTop:`1px solid #E2DDD6`, padding:"10px 12px", display:"flex", gap:8, background:"#FAF9F7" }}>
           <input
             style={{ ...S.input, flex:1, borderRadius:20, padding:"9px 16px" }}
             placeholder={activeCrew==="all" ? "Ask the whole crew…" : `Talk to ${CREW[activeCrew]?.name}…`}
@@ -2925,21 +3176,27 @@ function CrewChat({ bible, insights, videoLog, finalScripts, setIdeas, setTab, s
 
       {/* Suggested questions */}
       <Card>
-        <div style={{ fontSize:12.5, color:mute, marginBottom:10, fontWeight:600 }}>Try asking:</div>
+        <div style={{ fontSize:12.5, color:mute, marginBottom:10, fontWeight:600 }}>Start a real conversation:</div>
         <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
           {[
-            "What should I post this Saturday?",
-            "Which of my videos performed best and why?",
-            "How do I attract more K-pop fans?",
-            "Give me 3 hook ideas for a BLACKPINK video",
-            "Is my content too jewelry-focused?",
-            "What's missing from my content mix?",
-            "How do I build a cult following faster?",
-            "Roast my current strategy",
+            "Robin find me the hottest K-pop jewelry moment right now",
+            "Usopp write me 3 hook options for a Jisoo ring video",
+            "Nami what are my best videos telling us to do more of",
+            "What should I post this Saturday — crew decide together",
+            "Roast my current strategy, all of you",
+            "Luffy I need a clear direction for this week",
+            "Franky what needs to be logged that's missing",
+            "Is my content too jewelry-heavy? Fight about it",
           ].map(q=>(
             <button key={q} style={{ ...S.chip, fontSize:12, padding:"6px 12px" }} onClick={()=>{ setInput(q); }}>
               {q}
             </button>
+          ))}
+        </div>
+        <div style={{ marginTop:12, display:"flex", gap:8, flexWrap:"wrap" }}>
+          <div style={{ fontSize:11, color:mute, width:"100%", marginBottom:4 }}>Quick navigate:</div>
+          {[["ideas","💡 Ideas Board"],["studio","✍️ Studio"],["analytics","📊 Analytics"],["strategy","🗺️ Strategy"]].map(([k,l])=>(
+            <button key={k} style={{ ...S.chip, fontSize:12, padding:"6px 12px", borderColor:gold+"66", color:gold }} onClick={()=>setTab(k)}>{l}</button>
           ))}
         </div>
       </Card>
@@ -2982,17 +3239,17 @@ function Style() {
     @keyframes wave{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
     *{box-sizing:border-box}
     textarea,input,select,button{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
-    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #D4AF37;outline-offset:2px}
+    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #C8922A;outline-offset:2px}
     ::-webkit-scrollbar{width:7px;height:7px}
-    ::-webkit-scrollbar-track{background:#0A0E1F}
-    ::-webkit-scrollbar-thumb{background:#2A335C;border-radius:8px}
-    ::-webkit-scrollbar-thumb:hover{background:#B8860B88}
-    .wave-container{position:fixed;bottom:0;left:0;width:100%;height:100px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.12}
-    .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23D4AF37' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
+    ::-webkit-scrollbar-track{background:#F5F2EE}
+    ::-webkit-scrollbar-thumb{background:#D0CBC4;border-radius:8px}
+    ::-webkit-scrollbar-thumb:hover{background:#C8922A88}
+    .wave-container{position:fixed;bottom:0;left:0;width:100%;height:80px;overflow:hidden;pointer-events:none;z-index:0;opacity:0.08}
+    .wave{position:absolute;bottom:0;left:0;width:200%;height:100%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23C8922A' d='M0,50 C240,90 480,10 720,50 C960,90 1200,10 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;animation:wave 8s linear infinite}
     .wave2{animation-delay:-4s;opacity:0.5}
     .jolly-roger{animation:float 4s ease-in-out infinite}
     .crew-card-inner:hover{transform:translateY(-3px)}
-    .gold-shimmer{background:linear-gradient(90deg,#D4AF37,#F5E17A,#D4AF37,#A07C20,#D4AF37);background-size:200% auto;animation:shimmer 3s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .gold-shimmer{background:linear-gradient(90deg,#C8922A,#E8B84B,#C8922A,#8B5E0A,#C8922A);background-size:200% auto;animation:shimmer 3s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .nav-scroll{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .nav-scroll::-webkit-scrollbar{display:none}
   `}</style>;
@@ -3015,9 +3272,9 @@ function Bubble({ d, bossEntry }) {
         <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:4 }}>
           <span style={{ fontSize:15 }}>👑</span>
           <span style={{ fontWeight:700, fontSize:12.5, color:"#F0D27A" }}>You (Boss)</span>
-          <span style={{ color:"#5A6080", fontSize:11 }}>jumped in</span>
+          <span style={{ color:"#9B9490", fontSize:11 }}>jumped in</span>
         </div>
-        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #D4AF37", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
+        <div style={{ fontSize:13.5, lineHeight:1.6, color:"#1A1A2E", paddingLeft:26, borderLeft:"2px solid #C8922A", marginLeft:8, fontStyle:"italic" }}>{d.text}</div>
       </div>
     );
   }
@@ -3026,11 +3283,11 @@ function Bubble({ d, bossEntry }) {
     <div style={{ marginBottom:14 }}>
       <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3 }}>
         <span>{m.icon}</span>
-        <span style={{ fontWeight:600, fontSize:13, color:m.facet }}>{m.name} <span style={{ color:"#7E84A3", fontWeight:400 }}>({m.role})</span></span>
-        {d.round>0 && <span style={{ fontSize:11, color:"#5A6080" }}>· R{d.round}</span>}
+        <span style={{ fontWeight:600, fontSize:13, color:m.gem }}>{m.name} <span style={{ color:"#9B9490", fontWeight:400 }}>({m.role})</span></span>
+        {d.round>0 && <span style={{ fontSize:11, color:"#B0AAA5" }}>· R{d.round}</span>}
         <SpeakBtn text={`${m.name} says: ${d.text}`} crewKey={d.k} small />
       </div>
-      <div style={{ fontSize:13.5, lineHeight:1.55, color:"#E8E6F0", paddingLeft:24, borderLeft:`2px solid ${m.gem}55`, marginLeft:7 }}>{d.text}</div>
+      <div style={{ fontSize:13.5, lineHeight:1.55, color:"#1A1A2E", paddingLeft:24, borderLeft:`2px solid ${m.gem}88`, marginLeft:7 }}>{d.text}</div>
     </div>
   );
 }
@@ -3050,11 +3307,11 @@ function Step({ n, crew, label }) {
   </div>;
 }
 
-/* ---------- styles ---------- */
-const navy = "#0A0E1F", panel = "#111827", panel2 = "#1a2035", line = "#2A335C", gold = "#D4AF37", goldLight = "#E8C77E", goldDeep = "#C8922A", cream = "#F3EEE2", mute = "#7E8AAC", appBg = "#0A0E1F";
+/* ---------- styles — WHITE THEME ---------- */
+const navy = "#1A1A2E", panel = "#F8F7F4", panel2 = "#F0EDE8", line = "#E2DDD6", gold = "#C8922A", goldLight = "#A0710E", goldDeep = "#8B5E0A", cream = "#1A1A2E", mute = "#6B6560", appBg = "#FAF9F7";
 const S = {
-  app: { minHeight:"100vh", background:`radial-gradient(ellipse 120% 60% at 60% -10%,#1A2350 0%,#0A0E1F 60%),repeating-linear-gradient(45deg,#0D1228 0px,#0D1228 2px,transparent 2px,transparent 20px)`, color:cream, fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
-  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:`${navy}F0`, backdropFilter:"blur(16px)", zIndex:10 },
+  app: { minHeight:"100vh", background:"#FAF9F7", color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", paddingBottom:60 },
+  header: { padding:"16px 18px 10px", borderBottom:`1px solid ${line}`, position:"sticky", top:0, background:"#FFFEFCF5", backdropFilter:"blur(16px)", zIndex:10 },
   brandRow: { display:"flex", alignItems:"center", gap:14, marginBottom:12 },
   wordmark: { fontFamily:"'DM Sans',system-ui,-apple-system,sans-serif", fontSize:24, fontWeight:900, letterSpacing:2, lineHeight:1, display:"block" },
   tagline: { fontSize:11, color:mute, marginTop:3, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
@@ -3063,54 +3320,54 @@ const S = {
   navOn: { color:"#FFFFFF", background:`linear-gradient(135deg,${gold},${goldDeep})`, border:`1px solid ${goldDeep}`, fontWeight:700 },
   main: { maxWidth:800, margin:"0 auto", padding:"22px 16px" },
   eyebrow: { fontSize:10.5, letterSpacing:2.5, textTransform:"uppercase", color:gold, fontWeight:700, marginBottom:6, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  h2: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:24, fontWeight:700, margin:"0 0 8px", color:cream, lineHeight:1.2 },
+  h2: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:24, fontWeight:700, margin:"0 0 8px", color:"#1A1A2E", lineHeight:1.2 },
   lede: { fontSize:13.5, color:mute, lineHeight:1.65, margin:"0 0 18px", maxWidth:560 },
   card: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:"18px 18px", marginBottom:14, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
-  cardTitle: { fontWeight:700, fontSize:15, marginBottom:8, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  cardTitle: { fontWeight:700, fontSize:15, marginBottom:8, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   crewGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:12 },
   crewCard: { background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:16, padding:16, boxShadow:"0 1px 4px rgba(0,0,0,0.06)" },
-  crewName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:15, color:cream },
+  crewName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:15, color:"#1A1A2E" },
   crewRole: { fontSize:12, fontWeight:600, marginTop:2, letterSpacing:0.5 },
   crewBlurb: { fontSize:13, color:mute, lineHeight:1.55, margin:"10px 0 0" },
-  input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:9, color:cream, fontSize:13.5, outline:"none" },
-  textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid ${line}`, borderRadius:10, color:cream, fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
-  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:navy, border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
-  ghost: { background:"transparent", color:cream, border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
-  linkBtn: { background:"none", border:"none", color:"#E05060", textDecoration:"underline", cursor:"pointer", fontSize:12 },
-  chip: { background:"transparent", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
+  input: { flex:1, minWidth:120, padding:"10px 13px", background:"#FFFFFF", border:`1px solid #D0CBC4`, borderRadius:9, color:"#1A1A2E", fontSize:13.5, outline:"none" },
+  textarea: { width:"100%", padding:"12px 14px", background:"#FFFFFF", border:`1px solid #D0CBC4`, borderRadius:10, color:"#1A1A2E", fontSize:13.5, lineHeight:1.65, resize:"vertical", outline:"none" },
+  gold: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", border:"none", padding:"10px 20px", borderRadius:9, fontWeight:800, fontSize:13.5, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:0.3, fontFamily:"'DM Sans',system-ui,sans-serif", boxShadow:`0 2px 8px ${gold}44` },
+  ghost: { background:"transparent", color:"#1A1A2E", border:`1px solid ${line}`, padding:"9px 15px", borderRadius:9, fontSize:13, fontWeight:500, cursor:"pointer", whiteSpace:"nowrap", transition:"border-color 0.15s" },
+  linkBtn: { background:"none", border:"none", color:"#C0392B", textDecoration:"underline", cursor:"pointer", fontSize:12 },
+  chip: { background:"#FFFFFF", border:`1px solid ${line}`, color:mute, padding:"7px 14px", borderRadius:20, fontSize:12.5, fontWeight:600, cursor:"pointer" },
   seg: { background:"#FFFFFF", border:`1px solid ${line}`, color:mute, padding:"9px 16px", borderRadius:10, fontSize:13.5, fontWeight:600, cursor:"pointer" },
   segOn: { background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", borderColor:gold },
   trendRow: { display:"flex", gap:12, alignItems:"center", padding:"13px 0", borderTop:`1px solid ${line}` },
-  trendName: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  trendName: { fontWeight:700, fontSize:14.5, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   trendReason: { fontSize:12.5, color:mute, marginTop:3, lineHeight:1.5 },
   thread: { marginTop:12, paddingRight:4 },
-  verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF8DC)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}22` },
-  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:goldLight },
+  verdictBox: { background:`linear-gradient(180deg,#FFFBEF,#FFF5D6)`, border:`1px solid ${gold}66`, borderRadius:12, padding:16, marginTop:8, boxShadow:`0 2px 12px ${gold}18` },
+  verdictText: { margin:0, fontSize:14, lineHeight:1.65, color:"#5C3D00" },
   directive: { fontSize:12.5, color:"#7A5C00CC", marginTop:9 },
-  yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:cream, marginBottom:4 },
+  yourCall: { fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:700, fontSize:14, color:"#1A1A2E", marginBottom:4 },
   subtle: { fontSize:12.5, color:mute, marginBottom:4 },
   stepNum: { width:26, height:26, borderRadius:"50%", background:`linear-gradient(135deg,${gold},${goldDeep})`, color:"#FFFFFF", fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" },
-  stepLabel: { fontWeight:700, fontSize:14.5, color:cream, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  stepLabel: { fontWeight:700, fontSize:14.5, color:"#1A1A2E", fontFamily:"'DM Sans',system-ui,sans-serif" },
   briefBox: { background:panel2, border:`1px solid ${line}`, borderRadius:12, padding:14, marginTop:12 },
   miniLabel: { fontSize:10.5, letterSpacing:1.5, textTransform:"uppercase", color:gold, fontWeight:700, margin:"12px 0 5px", fontFamily:"'DM Sans',system-ui,sans-serif" },
   ul: { margin:"0", paddingLeft:18, fontSize:13, color:mute, lineHeight:1.7 },
-  caption: { fontSize:13, color:cream, lineHeight:1.6, background:panel2, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
+  caption: { fontSize:13, color:"#1A1A2E", lineHeight:1.6, background:panel2, borderRadius:8, padding:"9px 11px", whiteSpace:"pre-wrap", border:`1px solid ${line}` },
   logged: { fontSize:12.5, color:"#2D8A5E", marginTop:12 },
   formGrid: { display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:10, marginTop:12 },
   fieldLbl: { fontSize:11, color:mute, display:"block", marginBottom:4, letterSpacing:0.5 },
   scoreLbl: { fontSize:9.5, color:mute, letterSpacing:1, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  briefBack: { background:navy, borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}` },
-  shotBox: { background:panel2, border:`1px dashed ${gold}66`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
+  briefBack: { background:"#F5F2EE", borderRadius:10, padding:12, marginTop:10, fontSize:12.5, lineHeight:1.55, border:`1px solid ${line}`, color:"#1A1A2E" },
+  shotBox: { background:"#FFF9F0", border:`1px dashed ${gold}88`, borderRadius:10, padding:12, marginTop:6, marginBottom:4 },
   weekRow: { display:"flex", gap:12, padding:"13px 0", borderTop:`1px solid ${line}` },
   weekNum: { width:34, height:34, borderRadius:9, background:`linear-gradient(135deg,${gold},${goldDeep})`, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"#FFFFFF", fontSize:13, fontFamily:"'DM Sans',system-ui,sans-serif" },
-  weekFocus: { fontWeight:700, fontSize:14, color:cream, marginBottom:5, fontFamily:"'DM Sans',system-ui,sans-serif" },
+  weekFocus: { fontWeight:700, fontSize:14, color:"#1A1A2E", marginBottom:5, fontFamily:"'DM Sans',system-ui,sans-serif" },
   dayBlock: { padding:"12px 0", borderTop:`1px solid ${line}` },
   dayName: { fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:16, color:gold, marginBottom:8, fontWeight:700 },
-  postRow: { background:panel2, border:`1px solid ${line}`, borderRadius:10, padding:11, marginBottom:8 },
-  postIdea: { fontSize:13.5, color:cream, fontWeight:600, lineHeight:1.5 },
+  postRow: { background:"#FAFAF8", border:`1px solid ${line}`, borderRadius:10, padding:11, marginBottom:8 },
+  postIdea: { fontSize:13.5, color:"#1A1A2E", fontWeight:600, lineHeight:1.5 },
   postFilm: { fontSize:12.5, color:mute, marginTop:5 },
   postCap: { fontSize:12.5, color:"#4A6FA5", marginTop:4 },
-  ideaText: { fontSize:14.5, color:cream, lineHeight:1.5, flex:1 },
+  ideaText: { fontSize:14.5, color:"#1A1A2E", lineHeight:1.5, flex:1 },
   ideaReact: { fontSize:13, color:mute, lineHeight:1.55, paddingLeft:22 },
   tag: { fontSize:11, padding:"3px 9px", borderRadius:7, background:panel2, color:mute, border:`1px solid ${line}`, fontWeight:600 },
   empty: { textAlign:"center", color:mute, fontSize:13.5, padding:"32px 10px", fontFamily:"'DM Sans',system-ui,sans-serif" },
