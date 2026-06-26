@@ -341,13 +341,11 @@ async function loadKey(key, fallback) {
     });
     if (r.ok) {
       const d = await r.json();
-      const sbVal = d.value;
-      // Treat null AND empty arrays as "no data" — don't let an empty Supabase response overwrite real localStorage data
-      const sbIsUsable = sbVal != null && !(Array.isArray(sbVal) && sbVal.length === 0);
-      if (sbIsUsable) {
+      if (d.value != null) {
         // Supabase has data — use it and update localStorage cache
+        const sbVal = d.value;
         // If Supabase has LESS data than localStorage, keep localStorage (safer)
-        const sbCount = Array.isArray(sbVal) ? sbVal.length : 1;
+        const sbCount = Array.isArray(sbVal) ? sbVal.length : (sbVal ? 1 : 0);
         const localCount = Array.isArray(localVal) ? localVal.length : (localVal ? 1 : 0);
         if (sbCount >= localCount) {
           try { localStorage.setItem(key, JSON.stringify(sbVal)); } catch(e) {}
@@ -361,7 +359,7 @@ async function loadKey(key, fallback) {
           return localVal;
         }
       }
-      // Supabase returned null or empty array — use localStorage if available
+      // Supabase returned null/empty — use localStorage if available
       if (localVal != null) return localVal;
     }
   } catch(e) {}
@@ -536,7 +534,7 @@ export default function App() {
       videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek
     };
     try { localStorage.setItem("jg_autobackup", JSON.stringify(snapshot)); } catch(e) {}
-  }, [hydrated, videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek]);
+  }, [hydrated]);
 
   return (
     <div style={S.app}>
@@ -2278,8 +2276,14 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
             <div style={{ color:CREW.robin.facet }}><b>Brief → Nico Robin:</b> {v.ai.toRobin}</div>
             <div style={{ color:CREW.usopp.facet, marginTop:4 }}><b>Brief → Usopp:</b> {v.ai.toUsopp}</div>
           </div>
-          <div style={{ marginTop:10 }}>
+          <div style={{ marginTop:10, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
             <button style={S.ghost} onClick={()=>editEntry(v)}>Update stats (numbers changed)</button>
+            <button style={S.linkBtn} onClick={()=>{
+              if (!window.confirm(\`Delete "\${v.title}"? This can't be undone.\`)) return;
+              const idx = videoLog.findIndex(x => x.id === v.id);
+              setVideoLog(prev => prev.filter(x => x.id !== v.id));
+              if (idx !== -1) setInsights(prev => prev.filter((_, i) => i !== idx));
+            }}>Delete</button>
           </div>
         </Card>
       ))}
