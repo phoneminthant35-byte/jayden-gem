@@ -3162,7 +3162,7 @@ CRITICAL RULES:
         <div style={{ borderTop:`1px solid #E2DDD6`, padding:"10px 12px", display:"flex", gap:8, background:"#FAF9F7" }}>
           <input
             style={{ ...S.input, flex:1, borderRadius:20, padding:"9px 16px" }}
-            placeholder={activeCrew==="all" ? "Ask the whole crew…" : `Talk to ${CREW[activeCrew]?.name}…`}
+            placeholder="Talk to the crew…"
             value={input}
             onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
