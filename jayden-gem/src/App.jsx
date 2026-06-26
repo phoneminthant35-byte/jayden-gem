@@ -6,7 +6,6 @@ import React, { useState, useRef, useEffect } from "react";
    and learns. Navy + gold, every member a gem.
    ============================================================ */
 
-
 // ---------- CREW ----------
 const CREW = {
   robin:    { name: "Nico Robin", role: "Trend Researcher", gem: "#9B6BD6", facet: "#C9A4F0", icon: "🔮",
@@ -342,11 +341,13 @@ async function loadKey(key, fallback) {
     });
     if (r.ok) {
       const d = await r.json();
-      if (d.value != null) {
+      const sbVal = d.value;
+      // Treat null AND empty arrays as "no data" — don't let an empty Supabase response overwrite real localStorage data
+      const sbIsUsable = sbVal != null && !(Array.isArray(sbVal) && sbVal.length === 0);
+      if (sbIsUsable) {
         // Supabase has data — use it and update localStorage cache
-        const sbVal = d.value;
         // If Supabase has LESS data than localStorage, keep localStorage (safer)
-        const sbCount = Array.isArray(sbVal) ? sbVal.length : (sbVal ? 1 : 0);
+        const sbCount = Array.isArray(sbVal) ? sbVal.length : 1;
         const localCount = Array.isArray(localVal) ? localVal.length : (localVal ? 1 : 0);
         if (sbCount >= localCount) {
           try { localStorage.setItem(key, JSON.stringify(sbVal)); } catch(e) {}
@@ -360,7 +361,7 @@ async function loadKey(key, fallback) {
           return localVal;
         }
       }
-      // Supabase returned null/empty — use localStorage if available
+      // Supabase returned null or empty array — use localStorage if available
       if (localVal != null) return localVal;
     }
   } catch(e) {}
@@ -535,7 +536,7 @@ export default function App() {
       videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek
     };
     try { localStorage.setItem("jg_autobackup", JSON.stringify(snapshot)); } catch(e) {}
-  }, [hydrated]);
+  }, [hydrated, videoLog, ideas, finalScripts, insights, pageInsights, bible, calMonth, calWeek]);
 
   return (
     <div style={S.app}>
