@@ -2279,7 +2279,7 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
           <div style={{ marginTop:10, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
             <button style={S.ghost} onClick={()=>editEntry(v)}>Update stats (numbers changed)</button>
             <button style={S.linkBtn} onClick={()=>{
-              if (!window.confirm(\`Delete "\${v.title}"? This can't be undone.\`)) return;
+              if (!window.confirm("Delete \"" + v.title + "\"? This can't be undone.")) return;
               const idx = videoLog.findIndex(x => x.id === v.id);
               setVideoLog(prev => prev.filter(x => x.id !== v.id));
               if (idx !== -1) setInsights(prev => prev.filter((_, i) => i !== idx));
