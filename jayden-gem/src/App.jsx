@@ -6,7 +6,6 @@ import React, { useState, useRef, useEffect } from "react";
    and learns. Navy + gold, every member a gem.
    ============================================================ */
 
-
 // ---------- CREW ----------
 const CREW = {
   robin:    { name: "Nico Robin", role: "Trend Researcher", gem: "#9B6BD6", facet: "#C9A4F0", icon: "🔮",
@@ -96,7 +95,7 @@ Sein Nan Daw (4.8M), ZweHtet Gold & Jewellery, Pyae Gyi (4.7M), 97 Media (2.2M).
 Academy course line: 095060182 / 09443939440. Yangon.
 `;
 
-const HOOK_TYPES = ["Engineering Flaw", "Lifestyle Mismatch", "Comfort Trap", "Price Shock", "VS / Head-to-head", "Ranking", "Personal / Story"];
+const HOOK_TYPES = ["Engineering Flaw", "Lifestyle Mismatch", "Comfort Trap", "Price Shock", "VS / Head-to-head", "Ranking", "Personal / Story", "Mystery", "Celebrity Jewelry", "Write my own"];
 
 // ---------- API ----------
 async function ask(system, user, json = false, maxTokens = 1000) {
@@ -1872,12 +1871,12 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
           <div style={{ background:"#0A1A0A", border:"1px solid #206040", borderRadius:10, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
             <div>
               <div style={{ fontSize:11, color:"#7FD3AE", fontWeight:700, letterSpacing:1, marginBottom:2 }}>✓ LAST LOGGED</div>
-              <div style={{ fontSize:13.5, color:cream, fontWeight:600 }}>{last.title || "(untitled)"}</div>
-              <div style={{ fontSize:12, color:mute, marginTop:2 }}>{last.account} · {last.views ? Number(last.views).toLocaleString()+" views" : ""} · {loggedAt}</div>
+              <div style={{ fontSize:13.5, color:"#F0EDE6", fontWeight:600 }}>{last.title || "(untitled)"}</div>
+              <div style={{ fontSize:12, color:"#9BA8C4", marginTop:2 }}>{last.account} · {last.views ? Number(last.views).toLocaleString()+" views" : ""} · {loggedAt}</div>
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:22, fontWeight:700, color: last.ai?.score>=70?"#7FD3AE":last.ai?.score>=45?"#F0D27A":"#F2929F" }}>{last.ai?.score}</div>
-              <div style={{ fontSize:10, color:mute }}>SCORE</div>
+              <div style={{ fontSize:10, color:"#9BA8C4" }}>SCORE</div>
             </div>
           </div>
         );
@@ -1973,7 +1972,15 @@ function Analytics({ videoLog, setVideoLog, insights, setInsights, bible, finalS
           <Field label="Shares"><input style={S.input} type="number" value={f.shares} onChange={e=>set("shares",e.target.value)} /></Field>
           <Field label="Saves"><input style={S.input} type="number" value={f.saves} onChange={e=>set("saves",e.target.value)} /></Field>
           <Field label="Celebrity"><input style={S.input} value={f.celebrity} onChange={e=>set("celebrity",e.target.value)} /></Field>
-          <Field label="Hook type"><select style={S.input} value={f.hookType} onChange={e=>set("hookType",e.target.value)}>{HOOK_TYPES.map(h=><option key={h}>{h}</option>)}</select></Field>
+          <Field label="Hook type">
+            <select style={S.input} value={f.hookType} onChange={e=>set("hookType",e.target.value)}>
+              {HOOK_TYPES.map(h=><option key={h}>{h}</option>)}
+            </select>
+            {f.hookType === "Write my own" && (
+              <input style={{ ...S.input, marginTop:6 }} placeholder="Describe your hook style…"
+                value={f.customHook||""} onChange={e=>set("customHook",e.target.value)} />
+            )}
+          </Field>
           <Field label="Date posted"><input style={S.input} type="date" value={f.date} onChange={e=>set("date",e.target.value)} /></Field>
           <Field label="Days since posted"><input style={S.input} type="number" min="1" placeholder="e.g. 1" value={f.daysOld} onChange={e=>set("daysOld",e.target.value)} /></Field>
         </div>
