@@ -326,7 +326,14 @@ function getSizeKB(value) {
 }
 
 async function loadKey(key, fallback) {
-  // Always try Supabase first — it's the source of truth across devices
+  // ALWAYS check localStorage first — it's the fastest and most reliable local cache
+  let localVal = null;
+  try {
+    const v = localStorage.getItem(key);
+    if (v != null) localVal = JSON.parse(v);
+  } catch(e) {}
+
+  // Try Supabase — it's the cross-device source of truth
   try {
     const r = await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -335,22 +342,54 @@ async function loadKey(key, fallback) {
     if (r.ok) {
       const d = await r.json();
       if (d.value != null) {
-        // Also update localStorage as cache
-        try { localStorage.setItem(key, JSON.stringify(d.value)); } catch(e) {}
-        return d.value;
+        // Supabase has data — use it and update localStorage cache
+        const sbVal = d.value;
+        // If Supabase has LESS data than localStorage, keep localStorage (safer)
+        const sbCount = Array.isArray(sbVal) ? sbVal.length : (sbVal ? 1 : 0);
+        const localCount = Array.isArray(localVal) ? localVal.length : (localVal ? 1 : 0);
+        if (sbCount >= localCount) {
+          try { localStorage.setItem(key, JSON.stringify(sbVal)); } catch(e) {}
+          return sbVal;
+        } else {
+          // localStorage has more data — push it back up to Supabase silently
+          fetch("/api/crew", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "db_set", dataKey: key, value: localVal, updated_at: new Date().toISOString() })
+          }).catch(() => {});
+          return localVal;
+        }
       }
+      // Supabase returned null/empty — use localStorage if available
+      if (localVal != null) return localVal;
     }
   } catch(e) {}
-  // Fall back to localStorage if Supabase unreachable
-  try { const v = localStorage.getItem(key); return v != null ? JSON.parse(v) : fallback; }
-  catch(e) { return fallback; }
+
+  // Both failed — use localStorage if we have it, otherwise fallback
+  return localVal != null ? localVal : fallback;
 }
 
 async function saveKey(key, value) {
   const trimmed = trimData(key, value);
-  // Save to localStorage immediately as backup
+  // SAFETY: never overwrite existing data with empty arrays
+  const isEmpty = Array.isArray(trimmed) ? trimmed.length === 0 : trimmed == null;
+  if (isEmpty) {
+    // Check if there's existing data before allowing the empty save
+    try {
+      const existing = localStorage.getItem(key);
+      if (existing) {
+        const parsed = JSON.parse(existing);
+        const hasData = Array.isArray(parsed) ? parsed.length > 0 : parsed != null;
+        if (hasData) {
+          // Don't overwrite real data with empty — this is likely a bug/race condition
+          console.warn("saveKey blocked empty overwrite for", key);
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+  // Save to localStorage immediately
   try { localStorage.setItem(key, JSON.stringify(trimmed)); } catch(e) {}
-  // Always await Supabase save — this is the permanent storage
+  // Save to Supabase
   try {
     await fetch("/api/crew", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -385,7 +424,8 @@ export default function App() {
   const [studioPendingTopic, setStudioPendingTopic] = useState(null);
   const [err, setErr] = useState(null);
   const [hydrated, setHydrated] = useState(false);
-  const [syncStatus, setSyncStatus] = useState("connecting"); // "connected" | "offline" | "connecting"
+  const [syncStatus, setSyncStatus] = useState("connecting");
+  const [dataRecovered, setDataRecovered] = useState(false);
 
   // Storage health — warn when approaching auto-trim limits
   const storageWarning = hydrated && (
@@ -404,29 +444,66 @@ export default function App() {
         setSyncStatus(test.ok ? "connected" : "offline");
       } catch(e) { setSyncStatus("offline"); }
 
-      setBible(await loadKey("jg_bible", DEFAULT_BIBLE));
-      setInsights(await loadKey("jg_insights", []));
-      setVideoLog(await loadKey("jg_videoLog", []));
-      setIdeas(await loadKey("jg_ideas", []));
-      setFinalScripts(await loadKey("jg_finalScripts", []));
-      setPageInsights(await loadKey("jg_pageInsights", []));
-      setCalMonth(await loadKey("jg_calMonth", null));
-      setCalWeek(await loadKey("jg_calWeek", null));
-      setPendingLogs(await loadKey("jg_pendingLogs", []));
+      const loadedBible = await loadKey("jg_bible", DEFAULT_BIBLE);
+      const loadedInsights = await loadKey("jg_insights", []);
+      const loadedVideoLog = await loadKey("jg_videoLog", []);
+      const loadedIdeas = await loadKey("jg_ideas", []);
+      const loadedScripts = await loadKey("jg_finalScripts", []);
+      const loadedPageInsights = await loadKey("jg_pageInsights", []);
+      const loadedCalMonth = await loadKey("jg_calMonth", null);
+      const loadedCalWeek = await loadKey("jg_calWeek", null);
+      const loadedPending = await loadKey("jg_pendingLogs", []);
+
+      // If everything loaded empty, check autobackup and restore silently
+      const totalLoaded = loadedVideoLog.length + loadedIdeas.length + loadedScripts.length + loadedInsights.length;
+      if (totalLoaded === 0) {
+        try {
+          const raw = localStorage.getItem("jg_autobackup");
+          if (raw) {
+            const backup = JSON.parse(raw);
+            const backupTotal = (backup.videoLog?.length||0) + (backup.ideas?.length||0) + (backup.finalScripts?.length||0);
+            if (backupTotal > 0) {
+              // Auto-restore from backup silently
+              if (backup.videoLog?.length) { setVideoLog(backup.videoLog); saveKey("jg_videoLog", backup.videoLog); }
+              if (backup.ideas?.length) { setIdeas(backup.ideas); saveKey("jg_ideas", backup.ideas); }
+              if (backup.finalScripts?.length) { setFinalScripts(backup.finalScripts); saveKey("jg_finalScripts", backup.finalScripts); }
+              if (backup.insights?.length) { setInsights(backup.insights); saveKey("jg_insights", backup.insights); }
+              if (backup.pageInsights?.length) { setPageInsights(backup.pageInsights); saveKey("jg_pageInsights", backup.pageInsights); }
+              if (backup.bible) { setBible(backup.bible); saveKey("jg_bible", backup.bible); }
+              if (backup.calMonth) { setCalMonth(backup.calMonth); saveKey("jg_calMonth", backup.calMonth); }
+              if (backup.calWeek) { setCalWeek(backup.calWeek); saveKey("jg_calWeek", backup.calWeek); }
+              setDataRecovered(true);
+              setHydrated(true);
+              return;
+            }
+          }
+        } catch(e) {}
+      }
+
+      setBible(loadedBible);
+      setInsights(loadedInsights);
+      setVideoLog(loadedVideoLog);
+      setIdeas(loadedIdeas);
+      setFinalScripts(loadedScripts);
+      setPageInsights(loadedPageInsights);
+      setCalMonth(loadedCalMonth);
+      setCalWeek(loadedCalWeek);
+      setPendingLogs(loadedPending);
       setHydrated(true);
     })();
   }, []);
 
   // Save whenever data changes (only after first load, so we never wipe stored data)
+  // Extra guard: never save empty arrays — that's always a bug, never intentional data
   useEffect(() => { if (hydrated) saveKey("jg_bible", bible); }, [bible, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_insights", insights); }, [insights, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_videoLog", videoLog); }, [videoLog, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_ideas", ideas); }, [ideas, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_finalScripts", finalScripts); }, [finalScripts, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_pageInsights", pageInsights); }, [pageInsights, hydrated]);
+  useEffect(() => { if (hydrated && insights.length > 0) saveKey("jg_insights", insights); }, [insights, hydrated]);
+  useEffect(() => { if (hydrated && videoLog.length > 0) saveKey("jg_videoLog", videoLog); }, [videoLog, hydrated]);
+  useEffect(() => { if (hydrated && ideas.length > 0) saveKey("jg_ideas", ideas); }, [ideas, hydrated]);
+  useEffect(() => { if (hydrated && finalScripts.length > 0) saveKey("jg_finalScripts", finalScripts); }, [finalScripts, hydrated]);
+  useEffect(() => { if (hydrated && pageInsights.length > 0) saveKey("jg_pageInsights", pageInsights); }, [pageInsights, hydrated]);
   useEffect(() => { if (hydrated && calMonth) saveKey("jg_calMonth", calMonth); }, [calMonth, hydrated]);
   useEffect(() => { if (hydrated && calWeek) saveKey("jg_calWeek", calWeek); }, [calWeek, hydrated]);
-  useEffect(() => { if (hydrated) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
+  useEffect(() => { if (hydrated && pendingLogs.length > 0) saveKey("jg_pendingLogs", pendingLogs); }, [pendingLogs, hydrated]);
 
   // Auto-push to Google Sheets whenever key data changes (debounced 3s so it doesn't fire on every keystroke)
   const sheetsTimerRef = useRef(null);
@@ -469,6 +546,12 @@ export default function App() {
       </div>
       <Header tab={tab} setTab={setTab} syncStatus={syncStatus} />
       {err && <div style={S.err}>⚠️ <b>Something went wrong:</b> {err} <button style={S.linkBtn} onClick={() => setErr(null)}>dismiss</button></div>}
+      {dataRecovered && (
+        <div style={{ maxWidth:800, margin:"10px auto 0", background:"#0A1A0A", color:"#7FD3AE", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #206040", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span>✅ <b>Data recovered automatically</b> — your videos, ideas and scripts were restored from local backup. Everything is safe.</span>
+          <button style={{ ...S.linkBtn, color:"#7FD3AE" }} onClick={() => setDataRecovered(false)}>dismiss</button>
+        </div>
+      )}
       {storageWarning && (
         <div style={{ maxWidth:800, margin:"10px auto 0", background:"#1A1400", color:"#F0D27A", padding:"10px 15px", borderRadius:10, fontSize:13, border:"1px solid #6B541888", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <span>🔧 <b>Franky says:</b> Storage getting full — run your weekly export and old entries will auto-trim to stay healthy.</span>
